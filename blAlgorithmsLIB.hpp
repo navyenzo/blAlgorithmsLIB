@@ -69,6 +69,22 @@
 
 #include "blCountAndFind.hpp"
 
+
+
+// Functions that calculate the page number of a string
+// and the corresponding string from a given page number
+//
+// -- The page number would correspond to the string's
+//    position in a theoretical library big enough to hold
+//    all the knowledge that could ever be expressed
+//    using the number of characters in the string
+//
+// -- This is like an example of a "Library of Babel"
+// -- Each string has a unique page number
+// -- The functions are NOT case sensitive
+
+#include "blLibraryOfBabel.hpp"
+
 //-------------------------------------------------------------------
 
 
