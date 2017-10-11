@@ -125,16 +125,15 @@ inline blOutputStreamType& writeBuffer(blOutputStreamType& os,const blBufferType
 
 
 //-------------------------------------------------------------------
-// The following function reads from a specified
-// input stream and writes the information into a
-// specified output stream using a specified buffer
-// return the actual number of bytes read
+// The following function does buffered reading/writing from an input
+// stream to an output stream.
+// The function keeps reading/writing until no bytes are read
 //
-// -- The function assumes that the streams define
-//    the "read", "write" and "gcount" functions
+// -- The function assumes the following:
 //
-// -- The function also assumes that the buffer
-//    defines the "operator[]" and "size" functions
+//    -- The input stream defines the functions "read" and "gcount"
+//    -- The output stream defines the "write" function
+//    -- The buffer defines the "operator[]" and "size" functions
 //-------------------------------------------------------------------
 template<typename blInputStreamType,
          typename blOutputStreamType,
@@ -142,8 +141,7 @@ template<typename blInputStreamType,
 
 inline int readFromStreamWriteToStream(blInputStreamType& inputStream,
                                        blOutputStreamType& outputStream,
-                                       blBufferType& buffer,
-                                       const std::size_t& maxNumOfElementsToReadAtOnce = )
+                                       blBufferType& buffer)
 {
     // Variable used to know how
     // many bytes were read from
