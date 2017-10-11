@@ -152,6 +152,12 @@ inline int readFromStreamWriteToStream(blInputStreamType& inputStream,
 
 
 
+    // Total number of bytes read
+
+    int totalNumberOfBytesRead = 0;
+
+
+
     // Keep reading/writing until
     // no more bytes are read
 
@@ -163,6 +169,8 @@ inline int readFromStreamWriteToStream(blInputStreamType& inputStream,
 
             numberOfBytesRead = inputStream.gcount();
 
+            totalNumberOfBytesRead += numberOfBytesRead;
+
             outputStream.write(reinterpret_cast<char*>(&buffer[0]),numberOfBytesRead);
         }
     }
@@ -171,7 +179,7 @@ inline int readFromStreamWriteToStream(blInputStreamType& inputStream,
 
     // We're done
 
-    return;
+    return totalNumberOfBytesRead;
 }
 //-------------------------------------------------------------------
 
