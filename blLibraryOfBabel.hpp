@@ -56,7 +56,7 @@ namespace blAlgorithmsLIB
 // Each string has a unique page number
 // The function is NOT case sensitive
 //
-// The calculation expect the number type to be
+// The calculation expects the number type to be
 // an arbitrary precision number big enough to be
 // able to hold all the possible combinations of
 // the alphabet being considered
@@ -86,10 +86,10 @@ void calculatePageNumber(const std::string& textInput,
     for(unsigned int i = 0; i < textInput.size(); ++i)
     {
         if(textInput[i] >= 'A' && textInput[i] <= 'Z')
-            currentCharacterValue = numberType(static_cast<int>(textInput[i]) - static_cast<int>('A') + static_cast<int>(3)) * pow(base,i);
+            currentCharacterValue = numberType(static_cast<int>(textInput[i]) - static_cast<int>('A') + static_cast<int>(3)) * std::pow(base,i);
 
         else if(textInput[i] >= 'a' && textInput[i] <= 'z')
-            currentCharacterValue = numberType(static_cast<int>(textInput[i]) - static_cast<int>('a') + static_cast<int>(3)) * pow(base,i);
+            currentCharacterValue = numberType(static_cast<int>(textInput[i]) - static_cast<int>('a') + static_cast<int>(3)) * std::pow(base,i);
 
         else if(textInput[i] == '.')
             currentCharacterValue =  pow(base,i);
