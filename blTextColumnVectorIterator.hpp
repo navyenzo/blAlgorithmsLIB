@@ -206,7 +206,7 @@ private: // Private functions
     // we're currently pointing to into
     // a number
 
-    void                                                                convertToNumber();
+    void                                                                convertToNumberFromCurrentPosition();
 
 
 
@@ -272,7 +272,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>::blTextColumn
 
     calculateTotalNumberOfRows();
 
-    convertToNumber();
+    convertToNumberFromCurrentPosition();
 }
 //-------------------------------------------------------------------
 
@@ -393,7 +393,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumn
 
         m_currentLine += actualMovement;
 
-        convertToNumber();
+        convertToNumberFromCurrentPosition();
     }
     else if(movement < 0)
     {
@@ -409,7 +409,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumn
             m_currentLine = blAlgorithmsLIB::findBeginningOfNthDataRow(m_beginIter,m_endIter,'\n',false,newRowToFind,m_iter);
         }
 
-        convertToNumber();
+        convertToNumberFromCurrentPosition();
     }
 
     return (*this);
@@ -542,7 +542,7 @@ inline void blTextColumnVectorIterator<blDataIteratorType,blNumberType>::setIter
 
     calculateTotalNumberOfRows();
 
-    convertToNumber();
+    convertToNumberFromCurrentPosition();
 }
 //-------------------------------------------------------------------
 
@@ -641,9 +641,9 @@ inline const int& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::g
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline void blTextColumnVectorIterator<blDataIteratorType,blNumberType>::convertToNumber()
+inline void blTextColumnVectorIterator<blDataIteratorType,blNumberType>::convertToNumberFromCurrentPosition()
 {
-    convertStringToNumber(m_iter,m_endIter,'.',m_number,0);
+    convertToNumber(m_iter,m_endIter,'.',m_number,0);
 }
 //-------------------------------------------------------------------
 

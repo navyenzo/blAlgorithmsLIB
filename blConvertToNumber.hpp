@@ -172,11 +172,11 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
 
         blNumberType exponent;
 
-        blStringIteratorType newPos = convertStringToNumber(currentPos,
-                                                            endIter,
-                                                            decimalPointDelimiter,
-                                                            exponent,
-                                                            numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter - 1);
+        blStringIteratorType newPos = convertToNumber(currentPos,
+                                                      endIter,
+                                                      decimalPointDelimiter,
+                                                      exponent,
+                                                      numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter - 1);
 
         if(newPos == currentPos)
         {
@@ -297,11 +297,11 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
 
             blNumberType exponent;
 
-            blStringIteratorType newPos = convertStringToNumber(currentPos,
-                                                                endIter,
-                                                                decimalPointDelimiter,
-                                                                exponent,
-                                                                numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter - numberOfRepeats);
+            blStringIteratorType newPos = convertToNumber(currentPos,
+                                                          endIter,
+                                                          decimalPointDelimiter,
+                                                          exponent,
+                                                          numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter - numberOfRepeats);
 
             if(newPos == currentPos)
             {
