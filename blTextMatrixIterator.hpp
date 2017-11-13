@@ -71,6 +71,10 @@
 namespace blAlgorithmsLIB
 {
 //-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 template<typename blDataIteratorType,
          typename blNumberType>
 
@@ -519,6 +523,13 @@ template<typename blDataIteratorType,
 inline const int& blTextMatrixIterator<blDataIteratorType,blNumberType>::getTotalNumberOfDataPointsPerRow()const
 {
     return m_totalNumberOfDataPointsPerRow;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// End of namespace
 }
 //-------------------------------------------------------------------
 

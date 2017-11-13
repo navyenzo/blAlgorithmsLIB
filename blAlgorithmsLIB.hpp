@@ -71,6 +71,19 @@
 
 
 
+// Function used to convert a sequence of characters
+// into a floating point number.
+// The function accepts "begin" and "end" iterators
+// and allows the user to specify the decimal point
+// delimiter/token
+// The function also return an iterator pointing to the
+// place right after the last character used to convert
+// to a number
+
+#include "blConvertToNumber.hpp"
+
+
+
 // Custom iterator useful in parsing serialized data
 // from generic text-data streams (for ex. files) and
 // turn it into a numeric matrix
