@@ -37,6 +37,14 @@
 
 
 //-------------------------------------------------------------------
+// Includes needed for these functions
+//-------------------------------------------------------------------
+#include <iterator>
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 // NOTE: This class is defined within the blAlgorithmsLIB namespace
 //-------------------------------------------------------------------
 namespace blAlgorithmsLIB
@@ -53,7 +61,7 @@ namespace blAlgorithmsLIB
 template<typename blDataIteratorType,
          typename blTokenType>
 
-inline size_t countDataRows(const blDataIteratorType& beginIter,
+inline std::size_t countDataRows(const blDataIteratorType& beginIter,
                             const blDataIteratorType& endIter,
                             const blTokenType& rowToken,
                             const bool& shouldZeroLengthRowsBeCounted)
@@ -65,7 +73,7 @@ inline size_t countDataRows(const blDataIteratorType& beginIter,
         // In this case there
         // are no rows
 
-        return size_t(0);
+        return std::size_t(0);
     }
 
     // Iterators used to
@@ -79,7 +87,7 @@ inline size_t countDataRows(const blDataIteratorType& beginIter,
     // of rows found by
     // this function
 
-    size_t totalNumberOfRows = size_t(0);
+    std::size_t totalNumberOfRows = std::size_t(0);
 
     while(firstTokenIterator != endIter)
     {
@@ -139,7 +147,7 @@ template<typename blDataIteratorType,
          typename blTokenType,
          typename blPredicateFunctorType>
 
-inline size_t countDataRows(const blDataIteratorType& beginIter,
+inline std::size_t countDataRows(const blDataIteratorType& beginIter,
                             const blDataIteratorType& endIter,
                             const blTokenType& rowToken,
                             const bool& shouldZeroLengthRowsBeCounted,
@@ -152,7 +160,7 @@ inline size_t countDataRows(const blDataIteratorType& beginIter,
         // In this case there
         // are no rows
 
-        return size_t(0);
+        return std::size_t(0);
     }
 
     // Iterators used to
@@ -166,7 +174,7 @@ inline size_t countDataRows(const blDataIteratorType& beginIter,
     // of rows found by
     // this function
 
-    size_t totalNumberOfRows = size_t(0);
+    std::size_t totalNumberOfRows = std::size_t(0);
 
     while(firstTokenIterator != endIter)
     {
@@ -233,7 +241,7 @@ inline size_t countDataRows(const blDataIteratorType& beginIter,
 template<typename blDataIteratorType,
          typename blTokenType>
 
-inline size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
+inline std::size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
                                          const blDataIteratorType& endIter,
                                          const blTokenType& rowToken)
 {
@@ -244,7 +252,7 @@ inline size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
         // Error -- Passed a zero
         //          length buffer
 
-        return size_t(0);
+        return std::size_t(0);
     }
 
     // The iterators to
@@ -257,12 +265,12 @@ inline size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
     // The length of the
     // longest data row
 
-    size_t longestLength = 0;
+    std::size_t longestLength = 0;
 
     // The length of the
     // current data row
 
-    size_t lengthOfCurrentRow = 0;
+    std::size_t lengthOfCurrentRow = 0;
 
     while(firstTokenIterator != endIter)
     {
@@ -321,7 +329,7 @@ template<typename blDataIteratorType,
          typename blTokenType,
          typename blPredicateFunctorType>
 
-inline size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
+inline std::size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
                                          const blDataIteratorType& endIter,
                                          const blTokenType& rowToken,
                                          const blPredicateFunctorType& predicateFunctor)
@@ -332,7 +340,7 @@ inline size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
         // Error -- Passed a zero
         //          length buffer
 
-        return size_t(0);
+        return std::size_t(0);
     }
 
     // The iterators to
@@ -345,12 +353,12 @@ inline size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
     // The length of the
     // longest data row
 
-    size_t longestLength = 0;
+    std::size_t longestLength = 0;
 
     // The length of the
     // current data row
 
-    size_t lengthOfCurrentRow = 0;
+    std::size_t lengthOfCurrentRow = 0;
 
     while(firstTokenIterator != endIter)
     {
