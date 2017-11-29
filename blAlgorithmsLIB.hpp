@@ -138,6 +138,14 @@
 
 
 
+// A custom iterator same as the above one
+// but that works with binary data instead
+// of text data
+
+#include "blBinaryMatrixIterator.hpp"
+
+
+
 // Functions that calculate the page number of a string
 // and the corresponding string from a given page number
 //

@@ -38,6 +38,14 @@
 
 
 //-------------------------------------------------------------------
+// Includes needed for this file
+//-------------------------------------------------------------------
+#include <iterator>
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 // NOTE: This class is defined within the blAlgorithmsLIB namespace
 //-------------------------------------------------------------------
 namespace blAlgorithmsLIB
@@ -58,7 +66,7 @@ public: // Iterator traits
 
     using iterator_category = std::random_access_iterator_tag;
     using value_type = blNumberType;
-    using difference_type = ptrdiff_t;
+    using difference_type = std::ptrdiff_t;
     using pointer = blNumberType*;
     using reference = blNumberType&;
 
@@ -129,9 +137,9 @@ public: // Access operators and functions
 
 
 
-    const blNumberType&                                                 operator[](const ptrdiff_t& index);
-    const blNumberType&                                                 operator()(const ptrdiff_t& index);
-    const blNumberType&                                                 at(const ptrdiff_t& index);
+    const blNumberType&                                                 operator[](const std::ptrdiff_t& index);
+    const blNumberType&                                                 operator()(const std::ptrdiff_t& index);
+    const blNumberType&                                                 at(const std::ptrdiff_t& index);
 
 
 
@@ -148,14 +156,14 @@ public: // Arithmetic operators
 
 
 
-    blTextColumnVectorIterator<blDataIteratorType,blNumberType>&        operator+=(const ptrdiff_t& movement);
-    blTextColumnVectorIterator<blDataIteratorType,blNumberType>&        operator-=(const ptrdiff_t& movement);
+    blTextColumnVectorIterator<blDataIteratorType,blNumberType>&        operator+=(const std::ptrdiff_t& movement);
+    blTextColumnVectorIterator<blDataIteratorType,blNumberType>&        operator-=(const std::ptrdiff_t& movement);
     blTextColumnVectorIterator<blDataIteratorType,blNumberType>&        operator++();
     blTextColumnVectorIterator<blDataIteratorType,blNumberType>&        operator--();
     blTextColumnVectorIterator<blDataIteratorType,blNumberType>         operator++(int);
     blTextColumnVectorIterator<blDataIteratorType,blNumberType>         operator--(int);
-    blTextColumnVectorIterator<blDataIteratorType,blNumberType>         operator+(const ptrdiff_t& movement)const;
-    blTextColumnVectorIterator<blDataIteratorType,blNumberType>         operator-(const ptrdiff_t& movement)const;
+    blTextColumnVectorIterator<blDataIteratorType,blNumberType>         operator+(const std::ptrdiff_t& movement)const;
+    blTextColumnVectorIterator<blDataIteratorType,blNumberType>         operator-(const std::ptrdiff_t& movement)const;
 
 
 
@@ -321,7 +329,7 @@ inline bool blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operato
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator[](const ptrdiff_t& index)
+inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator[](const std::ptrdiff_t& index)
 {
     (*this) += index - m_currentLine;
     return m_number;
@@ -332,7 +340,7 @@ inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumbe
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator()(const ptrdiff_t& index)
+inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator()(const std::ptrdiff_t& index)
 {
     (*this) += index - m_currentLine;
     return m_number;
@@ -343,7 +351,7 @@ inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumbe
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::at(const ptrdiff_t& index)
+inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::at(const std::ptrdiff_t& index)
 {
     (*this) += index - m_currentLine;
     return m_number;
@@ -382,7 +390,7 @@ inline const blNumberType& blTextColumnVectorIterator<blDataIteratorType,blNumbe
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator+=(const ptrdiff_t& movement)
+inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator+=(const std::ptrdiff_t& movement)
 {
     if(movement > 0)
     {
@@ -424,7 +432,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumn
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator-=(const ptrdiff_t& movement)
+inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator-=(const std::ptrdiff_t& movement)
 {
     return this->operator+=(-movement);
 }
@@ -482,7 +490,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType> blTextColumnV
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline blTextColumnVectorIterator<blDataIteratorType,blNumberType> blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator+(const ptrdiff_t& movement)const
+inline blTextColumnVectorIterator<blDataIteratorType,blNumberType> blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator+(const std::ptrdiff_t& movement)const
 {
     auto temp(*this);
 
@@ -496,7 +504,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType> blTextColumnV
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline blTextColumnVectorIterator<blDataIteratorType,blNumberType> blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator-(const ptrdiff_t& movement)const
+inline blTextColumnVectorIterator<blDataIteratorType,blNumberType> blTextColumnVectorIterator<blDataIteratorType,blNumberType>::operator-(const std::ptrdiff_t& movement)const
 {
     auto temp(*this);
 
@@ -694,7 +702,7 @@ public:
 
     using iterator_category = std::random_access_iterator_tag;
     using value_type = blNumberType;
-    using difference_type = ptrdiff_t;
+    using difference_type = std::ptrdiff_t;
     using pointer = blNumberType*;
     using reference = blNumberType&;
 
@@ -756,7 +764,7 @@ public:
     // Let's override the arithmetic operators
     // to make this move like a row-major matrix
 
-    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>&       operator+=(const ptrdiff_t& movement)
+    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>&       operator+=(const std::ptrdiff_t& movement)
     {
         int currentIndex = m_currentRow * m_totalNumberOfDataPointsPerRow + m_currentCol;
         int desiredIndex = currentIndex + movement;
@@ -769,7 +777,7 @@ public:
         return (*this);
     }
 
-    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>&       operator-=(const ptrdiff_t& movement)
+    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>&       operator-=(const std::ptrdiff_t& movement)
     {
         return this->operator+=(-movement);
     }
@@ -802,7 +810,7 @@ public:
         return temp;
     }
 
-    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>        operator+(const ptrdiff_t& movement)const
+    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>        operator+(const std::ptrdiff_t& movement)const
     {
         auto temp(*this);
 
@@ -811,7 +819,7 @@ public:
         return temp;
     }
 
-    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>        operator-(const ptrdiff_t& movement)const
+    blTextColumnVectorIterator2<blDataIteratorType,blNumberType>        operator-(const std::ptrdiff_t& movement)const
     {
         auto temp(*this);
 
@@ -828,7 +836,7 @@ public:
 
 
 
-    const blNumberType&             operator[](const ptrdiff_t& index)
+    const blNumberType&             operator[](const std::ptrdiff_t& index)
     {
         blTextColumnVectorIterator<blDataIteratorType,blNumberType>::at(index + 3);
 
@@ -837,7 +845,7 @@ public:
 
 
 
-    const blNumberType&             operator()(const ptrdiff_t& index)
+    const blNumberType&             operator()(const std::ptrdiff_t& index)
     {
         blTextColumnVectorIterator<blDataIteratorType,blNumberType>::at(index + 3);
 
@@ -854,7 +862,7 @@ public:
 
 
 
-    const blNumberType&             at(const ptrdiff_t& index)
+    const blNumberType&             at(const std::ptrdiff_t& index)
     {
         blTextColumnVectorIterator<blDataIteratorType,blNumberType>::at(index + 3);
 

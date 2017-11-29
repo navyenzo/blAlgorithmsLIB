@@ -41,6 +41,7 @@
 // Needed to carry out mathematical computations
 
 #include <math.h>
+#include <string>
 
 //-------------------------------------------------------------------
 
