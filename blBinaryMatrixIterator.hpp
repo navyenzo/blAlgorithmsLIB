@@ -157,6 +157,16 @@ public: // Equality operators
 
 
 
+public: // Reference and Dereference operators
+
+
+
+    blNumberType*                                                       operator->();
+    blNumberType&                                                       operator*();
+    const blNumberType&                                                 operator*()const;
+
+
+
 public: // Access operators
 
 
@@ -258,6 +268,7 @@ public: // Public functions
     const std::size_t&                                                  rows()const;
     const std::size_t&                                                  cols()const;
     const std::size_t&                                                  pages()const;
+    const std::size_t&                                                  currentIndex()const;
     const std::size_t&                                                  currentRow()const;
     const std::size_t&                                                  currentCol()const;
     const std::size_t&                                                  currentPage()const;
@@ -447,11 +458,11 @@ inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::setIterator
         // First we read the serial number, rows and cols
 
         m_serialNumber = static_cast<std::ptrdiff_t>( *(reinterpret_cast<blNumberType*>(&(*m_iter))) );
-        ++m_iter;
+        m_iter += sizeof(blNumberType);
         m_rows = static_cast<std::size_t>( *(reinterpret_cast<blNumberType*>(&(*m_iter))) );
-        ++m_iter;
+        m_iter += sizeof(blNumberType);
         m_cols = static_cast<std::size_t>( *(reinterpret_cast<blNumberType*>(&(*m_iter))) );
-        ++m_iter;
+        m_iter += sizeof(blNumberType);
 
 
 
@@ -673,6 +684,40 @@ template<typename blDataIteratorType,
 inline std::ptrdiff_t blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator-(const blBinaryMatrixIterator<blDataIteratorType,blNumberType>& binaryMatrixIterator)const
 {
     return (m_iter - binaryMatrixIterator.getIter())/static_cast<std::ptrdiff_t>(sizeof(blNumberType));
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Reference and Dereference operators
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blNumberType* blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator->()
+{
+    return reinterpret_cast<double*>(m_iter);
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator*()
+{
+    return (*reinterpret_cast<double*>(m_iter));
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline const blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator*()const
+{
+    return (*reinterpret_cast<double*>(m_iter));
 }
 //-------------------------------------------------------------------
 
@@ -909,6 +954,16 @@ template<typename blDataIteratorType,
 inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::pages()const
 {
     return m_pages;
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentIndex()const
+{
+    return m_currentIndex;
 }
 
 
