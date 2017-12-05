@@ -141,6 +141,15 @@
 // A custom iterator same as the above one
 // but that works with binary data instead
 // of text data
+// During iteration the user can specify
+// how this iterator advances through the
+// user supplied binary data stream
+// The user can specify the iterator to
+// advance in the following ways:
+// - column-major format (default)
+// - row-major format
+// - column-page-major format
+// - row-page-major format
 
 #include "blBinaryMatrixIterator.hpp"
 

@@ -76,6 +76,7 @@
 // Includes needed for this file
 //-------------------------------------------------------------------
 #include <iterator>
+#include <iostream>
 //-------------------------------------------------------------------
 
 
@@ -85,6 +86,18 @@
 //-------------------------------------------------------------------
 namespace blAlgorithmsLIB
 {
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Enum used to decide how to advance the iterator
+// throught the user supplied binary data stream
+//-------------------------------------------------------------------
+enum blAdvancingIteratorMethod {COL_MAJOR = 0,
+                                ROW_MAJOR = 1,
+                                COL_PAGE_MAJOR = 2,
+                                ROW_PAGE_MAJOR = 3};
 //-------------------------------------------------------------------
 
 
@@ -122,7 +135,8 @@ public: // Constructors and destructor
     // Constructor from two iterators
 
     blBinaryMatrixIterator(const blDataIteratorType& beginIter,
-                           const blDataIteratorType& endIter);
+                           const blDataIteratorType& endIter,
+                           const blAdvancingIteratorMethod& advancingIteratorMethod = COL_MAJOR);
 
 
 
@@ -232,15 +246,28 @@ public: // Public functions
 
     // Functions used to move the current
     // iterator position to the beginning
-    // or to the end
+    // or to the end or to some user specified
+    // position
 
     blBinaryMatrixIterator<blDataIteratorType,blNumberType>&            moveToTheBeginning();
     blBinaryMatrixIterator<blDataIteratorType,blNumberType>&            moveToTheEnd();
 
+    blBinaryMatrixIterator<blDataIteratorType,blNumberType>&            moveToPosition(const std::ptrdiff_t& rowIndex,
+                                                                                       const std::ptrdiff_t& colIndex = 0,
+                                                                                       const std::ptrdiff_t& pageIndex = 0);
 
 
-    // Let's override the arithmetic operators
-    // to make this move like a col-major matrix
+
+    // Function used to move the iterator by a
+    // user specified amount
+    // In this class the iterator is moved in
+    // a column-major format
+
+    void                                                                moveIterator(const std::ptrdiff_t& movement);
+
+
+
+    // Overloaded arithmetic operators
 
     blBinaryMatrixIterator<blDataIteratorType,blNumberType>&            operator+=(const std::ptrdiff_t& movement);
     blBinaryMatrixIterator<blDataIteratorType,blNumberType>&            operator-=(const std::ptrdiff_t& movement);
@@ -265,15 +292,26 @@ public: // Public functions
     // matrix header information
 
     const std::ptrdiff_t&                                               serialNumber()const;
+
     const std::size_t&                                                  rows()const;
     const std::size_t&                                                  cols()const;
     const std::size_t&                                                  pages()const;
-    const std::size_t&                                                  currentIndex()const;
-    const std::size_t&                                                  currentRow()const;
-    const std::size_t&                                                  currentCol()const;
-    const std::size_t&                                                  currentPage()const;
+
     const std::size_t&                                                  size()const;
     const std::size_t&                                                  length()const;
+
+    const std::ptrdiff_t&                                               currentIndex()const;
+    const std::ptrdiff_t&                                               currentRow()const;
+    const std::ptrdiff_t&                                               currentCol()const;
+    const std::ptrdiff_t&                                               currentPage()const;
+
+
+
+    // Functions used to set/get
+    // the advancing iterator method
+
+    const blAdvancingIteratorMethod&                                    getAdvancingIteratorMethod()const;
+    void                                                                setAdvancingIteratorMethod(const blAdvancingIteratorMethod& advancingIteratorMethod);
 
 
 
@@ -295,6 +333,23 @@ public: // Public functions
 
     blBinaryMatrixIterator<blDataIteratorType,blNumberType>             begin()const;
     blBinaryMatrixIterator<blDataIteratorType,blNumberType>             end()const;
+
+    blBinaryMatrixIterator<const blDataIteratorType,blNumberType>       cbegin()const;
+    blBinaryMatrixIterator<const blDataIteratorType,blNumberType>       cend()const;
+
+
+
+private: // Private functions
+
+
+
+    // Functions used to advance the iterator
+    // in different ways
+
+    void                                                                moveIterator_col_major(const std::ptrdiff_t& movement);
+    void                                                                moveIterator_row_major(const std::ptrdiff_t& movement);
+    void                                                                moveIterator_col_page_major(const std::ptrdiff_t& movement);
+    void                                                                moveIterator_row_page_major(const std::ptrdiff_t& movement);
 
 
 
@@ -341,10 +396,25 @@ protected: // Protected variables
 
     //  Current row, column and page in the buffer
 
-    std::size_t                                                         m_currentIndex;
-    std::size_t                                                         m_currentRow;
-    std::size_t                                                         m_currentCol;
-    std::size_t                                                         m_currentPage;
+    std::ptrdiff_t                                                      m_currentIndex;
+    std::ptrdiff_t                                                      m_currentRow;
+    std::ptrdiff_t                                                      m_currentCol;
+    std::ptrdiff_t                                                      m_currentPage;
+
+
+
+    // Variable used to decide how to advance
+    // the iterator
+    //
+    // 0: column-major advancement
+    //    ++ moves from one column
+    //    to the next one
+    //
+    // 1: row-major advancement
+    //    ++ moves from one row to
+    //    the next one
+
+    blAdvancingIteratorMethod                                           m_advancingIteratorMethod;
 };
 //-------------------------------------------------------------------
 
@@ -357,9 +427,11 @@ template<typename blDataIteratorType,
          typename blNumberType>
 
 inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>::blBinaryMatrixIterator(const blDataIteratorType& beginIter,
-                                                                                       const blDataIteratorType& endIter)
+                                                                                       const blDataIteratorType& endIter,
+                                                                                       const blAdvancingIteratorMethod& advancingIteratorMethod)
 {
     setIterators(beginIter,endIter);
+    setAdvancingIteratorMethod(advancingIteratorMethod);
 }
 //-------------------------------------------------------------------
 
@@ -506,10 +578,23 @@ template<typename blDataIteratorType,
 
 inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveToTheBeginning()
 {
-    // We move the iterator enough to
-    // make it point back to the beginning
+    // We set everything back to the beginning
+    // of the supplied binary data stream
 
-    this->operator+=(-m_currentIndex);
+    // If the supplied binary data stream is not
+    // big enough to support the expected header
+    // (serialNumber,Rows,Cols), then we just
+    // set the begin iter equal to the end iter
+
+    if(m_size == 0)
+        m_iter = m_endIter;
+    else
+        m_iter = m_beginIter + ( (m_currentIndex + 3) * sizeof(blNumberType) );
+
+    m_currentIndex = 0;
+    m_currentRow = 0;
+    m_currentCol = 0;
+    m_currentPage = 0;
 
     return (*this);
 }
@@ -521,10 +606,50 @@ template<typename blDataIteratorType,
 
 inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveToTheEnd()
 {
-    // We move the iterator enough to
-    // make it point back to the beginning
+    // We set everything to point to the end
+    // of the supplied binary data stream
 
-    this->operator+=(m_size - m_currentIndex);
+    m_iter = m_endIter;
+
+    m_currentIndex = m_size;
+    m_currentRow = m_rows;
+    m_currentCol = m_cols;
+    m_currentPage = m_pages;
+
+    return (*this);
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveToPosition(const std::ptrdiff_t& rowIndex,
+                                                                                                                                        const std::ptrdiff_t& colIndex,
+                                                                                                                                        const std::ptrdiff_t& pageIndex)
+{
+    // We move the iterator enough so that
+    // it points to the user specified
+    // position
+
+    // We do not check whether that position
+    // is valid or whether it would point to
+    // somewhere outside of the binary stream
+    // range
+
+    m_currentIndex = rowIndex + colIndex * static_cast<std::ptrdiff_t>(m_rows) + pageIndex * static_cast<std::ptrdiff_t>(m_cols * m_rows);
+
+
+
+    m_currentPage = m_currentIndex / static_cast<std::ptrdiff_t>(m_rows * m_cols);
+    m_currentCol = (m_currentIndex % static_cast<std::ptrdiff_t>(m_rows * m_cols)) / static_cast<std::ptrdiff_t>(m_rows);
+    m_currentRow = m_currentIndex % static_cast<std::ptrdiff_t>(m_rows);
+
+
+
+    m_iter = m_beginIter + ( (m_currentIndex + 3) * sizeof(blNumberType) );
+
+
 
     return (*this);
 }
@@ -533,40 +658,99 @@ inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIt
 
 
 //-------------------------------------------------------------------
-// Arithmetic operators to make the iterator
-// move like a col-major matrix
+// Function used to move the iterator by a
+// user specified amount
+// In this class the iterator is moved in
+// a column-major format
 //-------------------------------------------------------------------
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator+=(const std::ptrdiff_t& movement)
+inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveIterator(const std::ptrdiff_t& movement)
 {
-    // First we advance the current index
-    // making sure it never goes below
-    // zero or above the length of the data
+    // We do not check for out-of-bounds
 
-    if(movement < 0)
-    {
-        if(static_cast<std::size_t>(-movement) < m_currentIndex)
-            m_currentIndex -= static_cast<std::size_t>(-movement);
-        else
-            m_currentIndex = 0;
-    }
-    else
-    {
-        m_currentIndex += movement;
+    // The user is responsible to make sure
+    // the iterator does not move beyond
+    // the end iterator or move behind the
+    // begin iterator
 
-        if(m_currentIndex > m_size)
-            m_currentIndex = m_size;
+    // NOTE:  Some advancing methods such as
+    //        column-page-major and row-page-major
+    //        do check whether the iterator is
+    //        past the end and make it equal to
+    //        the end iterator
+
+
+
+    // Let's move the iterator the
+    // way the user has specified
+    // for us to move it
+
+    switch(m_advancingIteratorMethod)
+    {
+    default:
+    case COL_MAJOR:
+
+        this->moveIterator_col_major(movement);
+        break;
+
+
+
+    case ROW_MAJOR:
+
+        this->moveIterator_row_major(movement);
+        break;
+
+
+
+    case COL_PAGE_MAJOR:
+
+        this->moveIterator_col_page_major(movement);
+        break;
+
+
+
+    case ROW_PAGE_MAJOR:
+
+        this->moveIterator_row_page_major(movement);
+        break;
     }
+
+
+
+    // We're done
+
+    return;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Function used to advance the iterator
+// in a column-major way
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveIterator_col_major(const std::ptrdiff_t& movement)
+{
+    // We do not check for out-of-bounds
+
+    // The user is responsible to make sure
+    // the iterator does not move beyond
+    // the end iterator or move behind the
+    // begin iterator
+
+    m_currentIndex += movement;
 
 
 
     // We then move the current iterator
-    // to point to the current index in
-    // a circular way, so that it wraps
-    // around, whether moving in the positive
-    // or negative direction
+    // again not paying attention to whether
+    // the iterator has moved beyond the
+    // begin/end of the binary stream
 
     m_iter = m_beginIter + ( (m_currentIndex + 3) * sizeof(blNumberType) );
 
@@ -575,13 +759,233 @@ inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIt
     // We now calculate the current row
     // column and page
 
-    m_currentPage = m_currentIndex / (m_rows * m_cols);
-    m_currentRow = (m_currentIndex - m_currentPage * m_rows * m_cols) / m_cols;
-    m_currentCol = m_currentIndex % m_cols;
+    // If the user did not pay attention
+    // to the binary stream bounds, these
+    // indexes could be negative
+
+    m_currentPage = m_currentIndex / static_cast<std::ptrdiff_t>(m_rows * m_cols);
+    m_currentCol = (m_currentIndex % static_cast<std::ptrdiff_t>(m_rows * m_cols)) / static_cast<std::ptrdiff_t>(m_rows);
+    m_currentRow = m_currentIndex % static_cast<std::ptrdiff_t>(m_rows);
 
 
 
     // We're done
+
+    return;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Function used to advance the iterator
+// in a row-major way
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveIterator_row_major(const std::ptrdiff_t& movement)
+{
+    std::ptrdiff_t rowMajorIndex;
+    std::ptrdiff_t rowMajorRowIndex;
+    std::ptrdiff_t rowMajorColIndex;
+    std::ptrdiff_t rowMajorPageIndex;
+
+
+
+    // First we calculate the current
+    // index based on row-major iterator
+    // advancement
+
+    rowMajorIndex = m_currentCol + m_currentRow * m_cols + m_currentPage * m_cols * m_rows;
+
+
+
+    // We then advance the row-major
+    // current index
+
+    rowMajorIndex += movement;
+
+
+
+    // From that we calculate what the
+    // row, column and page coordinates
+    // are supposed to be
+
+    rowMajorPageIndex = rowMajorIndex / static_cast<std::ptrdiff_t>(m_rows * m_cols);
+    rowMajorRowIndex = (rowMajorIndex % static_cast<std::ptrdiff_t>(m_rows * m_cols)) / static_cast<std::ptrdiff_t>(m_cols);
+    rowMajorColIndex = rowMajorIndex % static_cast<std::ptrdiff_t>(m_cols);
+
+
+
+    // Finally we move the iterator
+    // to those coordinates
+
+    this->moveToPosition(rowMajorRowIndex,rowMajorColIndex,rowMajorPageIndex);
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Function used to advance the iterator
+// in a column-page-major way
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveIterator_col_page_major(const std::ptrdiff_t& movement)
+{
+    // We stack all the pages (each page is a matrix)
+    // together one below the other vertically
+    // so that this 3d-matrix setup becomes a long
+    // 2d-matrix (same number of columns but the
+    // number of rows equals m_rows * m_pages)
+
+
+
+    std::ptrdiff_t colPageMajorIndex;
+    std::ptrdiff_t colPageMajorRowIndex;
+    std::ptrdiff_t colPageMajorColIndex;
+    std::ptrdiff_t colPageMajorPageIndex;
+
+
+
+    // First thing is we calculate the current
+    // col-page-major row and column indexes
+    // noting that because we're stacking matrices
+    // vertically the number of columns doesn't change
+
+    colPageMajorRowIndex = m_currentRow + m_currentPage * static_cast<std::ptrdiff_t>(m_rows);
+    colPageMajorColIndex = m_currentCol;
+    colPageMajorIndex = colPageMajorRowIndex + colPageMajorColIndex * static_cast<std::ptrdiff_t>(m_rows * m_pages);
+
+
+
+    // We then advance the index
+
+    colPageMajorIndex += movement;
+
+
+
+    // We check to make sure that we
+    // did not go past the end
+
+    if(colPageMajorIndex >= m_size)
+    {
+        this->moveToTheEnd();
+    }
+    else
+    {
+        // Now we calculate back what the corresponding
+        // row, column and page index coordinates are
+
+        colPageMajorColIndex = colPageMajorIndex / static_cast<std::ptrdiff_t>(m_rows * m_pages);
+        colPageMajorRowIndex = colPageMajorIndex % static_cast<std::ptrdiff_t>(m_rows * m_pages);
+
+
+
+        // We then transform back to the 3d coordinates
+
+        colPageMajorPageIndex = colPageMajorRowIndex / static_cast<std::ptrdiff_t>(m_rows);
+        colPageMajorRowIndex = colPageMajorRowIndex % static_cast<std::ptrdiff_t>(m_rows);
+
+
+
+        // Finally we move the iterator to the
+        // calculated set of coordinates
+
+        this->moveToPosition(colPageMajorRowIndex,
+                             colPageMajorColIndex,
+                             colPageMajorPageIndex);
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Function used to advance the iterator
+// in a row-page-major way
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::moveIterator_row_page_major(const std::ptrdiff_t& movement)
+{
+    m_currentIndex += (movement * static_cast<std::ptrdiff_t>(m_rows));
+
+
+
+    // The index has to be circulated around
+    // because the binary data stream is assumed
+    // to be formatted in a col-major format
+
+    // We only circulate the index around until
+    // it's circulated the entire data, otherwise
+    // we just move it linearly
+
+    if(m_currentIndex >= static_cast<std::ptrdiff_t>(m_size + m_rows - 1) ||
+       m_currentIndex <= -static_cast<std::ptrdiff_t>(m_size + m_rows - 1))
+    {
+        // This means the iterator has parsed all
+        // the data and we just make it point to
+        // the end of the binary data stream
+
+        this->moveToTheEnd();
+    }
+    else
+    {
+        // This means the iterator has not
+        // yet parsed the entire data, so we
+        // wrap it around if it is numerically
+        // bigger than m_size
+        // We also move it by 1 so that it points
+        // to the next number in the given row
+        // and not the same number over and over
+
+        if(m_currentIndex >= static_cast<std::ptrdiff_t>(m_size))
+        {
+            m_currentIndex %= static_cast<std::ptrdiff_t>(m_size);
+            ++m_currentIndex;
+        }
+
+
+
+        // We then move the current iterator
+        // again not paying attention to whether
+        // the iterator has moved beyond the
+        // begin/end of the binary stream
+
+        m_iter = m_beginIter + ( (m_currentIndex + 3) * sizeof(blNumberType) );
+
+
+
+        // We now calculate the current row
+        // column and page
+
+        // If the user did not pay attention
+        // to the binary stream bounds, these
+        // indexes could be negative
+
+        m_currentPage = m_currentIndex / static_cast<std::ptrdiff_t>(m_rows * m_cols);
+        m_currentCol = (m_currentIndex % static_cast<std::ptrdiff_t>(m_rows * m_cols)) / static_cast<std::ptrdiff_t>(m_rows);
+        m_currentRow = m_currentIndex % static_cast<std::ptrdiff_t>(m_rows);
+    }
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Overloaded arithmetic operators
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator+=(const std::ptrdiff_t& movement)
+{
+    this->moveIterator(movement);
 
     return (*this);
 }
@@ -593,7 +997,9 @@ template<typename blDataIteratorType,
 
 inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator-=(const std::ptrdiff_t& movement)
 {
-    return this->operator+=(-movement);
+    this->moveIterator(-movement);
+
+    return (*this);
 }
 
 
@@ -603,7 +1009,9 @@ template<typename blDataIteratorType,
 
 inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator++()
 {
-    return operator+=(1);
+    this->moveIterator(1);
+
+    return (*this);
 }
 
 
@@ -613,7 +1021,9 @@ template<typename blDataIteratorType,
 
 inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator--()
 {
-    return operator+=(-1);
+    this->moveIterator(-1);
+
+    return (*this);
 }
 
 
@@ -625,7 +1035,7 @@ inline blBinaryMatrixIterator<blDataIteratorType,blNumberType> blBinaryMatrixIte
 {
     auto temp(*this);
 
-    operator+=(1);
+    this->moveIterator(1);
 
     return temp;
 }
@@ -639,7 +1049,7 @@ inline blBinaryMatrixIterator<blDataIteratorType,blNumberType> blBinaryMatrixIte
 {
     auto temp(*this);
 
-    operator+=(-1);
+    this->moveIterator(-1);
 
     return temp;
 }
@@ -697,7 +1107,7 @@ template<typename blDataIteratorType,
 
 inline blNumberType* blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator->()
 {
-    return reinterpret_cast<double*>(m_iter);
+    return reinterpret_cast<blNumberType*>(m_iter);
 }
 
 
@@ -707,7 +1117,7 @@ template<typename blDataIteratorType,
 
 inline blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator*()
 {
-    return (*reinterpret_cast<double*>(m_iter));
+    return (*reinterpret_cast<blNumberType*>(m_iter));
 }
 
 
@@ -717,7 +1127,7 @@ template<typename blDataIteratorType,
 
 inline const blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator*()const
 {
-    return (*reinterpret_cast<double*>(m_iter));
+    return (*reinterpret_cast<blNumberType*>(m_iter));
 }
 //-------------------------------------------------------------------
 
@@ -733,7 +1143,7 @@ template<typename blDataIteratorType,
 
 inline blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator[](const std::ptrdiff_t& index)
 {
-    return (reinterpret_cast<double*>(m_beginIter)[index + 3]);
+    return (reinterpret_cast<blNumberType*>(m_beginIter)[index + 3]);
 }
 
 
@@ -743,7 +1153,7 @@ template<typename blDataIteratorType,
 
 inline const blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator[](const std::ptrdiff_t& index)const
 {
-    return (reinterpret_cast<double*>(m_beginIter)[index + 3]);
+    return (reinterpret_cast<blNumberType*>(m_beginIter)[index + 3]);
 }
 
 
@@ -753,7 +1163,7 @@ template<typename blDataIteratorType,
 
 inline blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator()(const std::ptrdiff_t& index)
 {
-    return (reinterpret_cast<double*>(m_beginIter)[index + 3]);
+    return (reinterpret_cast<blNumberType*>(m_beginIter)[index + 3]);
 }
 
 
@@ -763,7 +1173,7 @@ template<typename blDataIteratorType,
 
 inline const blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::operator()(const std::ptrdiff_t& index)const
 {
-    return (reinterpret_cast<double*>(m_beginIter)[index + 3]);
+    return (reinterpret_cast<blNumberType*>(m_beginIter)[index + 3]);
 }
 
 
@@ -773,7 +1183,7 @@ template<typename blDataIteratorType,
 
 inline blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::at(const std::ptrdiff_t& index)
 {
-    return (reinterpret_cast<double*>(m_beginIter)[index + 3]);
+    return (reinterpret_cast<blNumberType*>(m_beginIter)[index + 3]);
 }
 
 
@@ -783,7 +1193,7 @@ template<typename blDataIteratorType,
 
 inline const blNumberType& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::at(const std::ptrdiff_t& index)const
 {
-    return (reinterpret_cast<double*>(m_beginIter)[index + 3]);
+    return (reinterpret_cast<blNumberType*>(m_beginIter)[index + 3]);
 }
 
 
@@ -911,6 +1321,58 @@ inline blBinaryMatrixIterator<blDataIteratorType,blNumberType> blBinaryMatrixIte
 
     return copiedSmartIterator;
 }
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blBinaryMatrixIterator<const blDataIteratorType,blNumberType> blBinaryMatrixIterator<blDataIteratorType,blNumberType>::cbegin()const
+{
+    auto copiedSmartIterator = (*this);
+
+    copiedSmartIterator.moveToTheBeginning();
+
+    return copiedSmartIterator;
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blBinaryMatrixIterator<const blDataIteratorType,blNumberType> blBinaryMatrixIterator<blDataIteratorType,blNumberType>::cend()const
+{
+    auto copiedSmartIterator = (*this);
+
+    copiedSmartIterator.moveToTheEnd();
+
+    return copiedSmartIterator;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Functions used to set/get the advancing iterator method
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline const blAdvancingIteratorMethod& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::getAdvancingIteratorMethod()const
+{
+    return m_advancingIteratorMethod;
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline void blBinaryMatrixIterator<blDataIteratorType,blNumberType>::setAdvancingIteratorMethod(const blAdvancingIteratorMethod& advancingIteratorMethod)
+{
+    m_advancingIteratorMethod = advancingIteratorMethod;
+}
 //-------------------------------------------------------------------
 
 
@@ -961,7 +1423,7 @@ inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentIndex()const
+inline const std::ptrdiff_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentIndex()const
 {
     return m_currentIndex;
 }
@@ -971,7 +1433,7 @@ inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentRow()const
+inline const std::ptrdiff_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentRow()const
 {
     return m_currentRow;
 }
@@ -981,7 +1443,7 @@ inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentCol()const
+inline const std::ptrdiff_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentCol()const
 {
     return m_currentCol;
 }
@@ -991,7 +1453,7 @@ inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType
 template<typename blDataIteratorType,
          typename blNumberType>
 
-inline const std::size_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentPage()const
+inline const std::ptrdiff_t& blBinaryMatrixIterator<blDataIteratorType,blNumberType>::currentPage()const
 {
     return m_currentPage;
 }
