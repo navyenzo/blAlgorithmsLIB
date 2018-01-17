@@ -34,7 +34,7 @@
 //                  -- For example a (2xN) matrix would look like the following:
 //
 //                     -- 123454321 (some serial number)
-//                     -- 2 (the rows in each data point)
+//                     -- 3 (the rows in each data point)
 //                     -- 1 (the columns in each data point, so this means each
 //                        data point is a single column vector
 //                     -- 0,0

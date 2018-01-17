@@ -268,7 +268,7 @@ template<typename blDataIteratorType,
          typename blNumberType>
 
 inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>::blTextColumnVectorIterator(const blDataIteratorType& beginIter,
-                                                                                   const blDataIteratorType& endIter)
+                                                                                               const blDataIteratorType& endIter)
 {
     m_beginIter = beginIter;
     m_endIter = endIter;
@@ -394,7 +394,7 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumn
 {
     if(movement > 0)
     {
-        int actualMovement = blAlgorithmsLIB::findBeginningOfNthDataRow(m_iter,m_endIter,'\n',false,movement,m_iter);
+        int actualMovement = findBeginningOfNthDataRow(m_iter,m_endIter,'\n',false,movement,m_iter);
 
         if(actualMovement < movement)
             m_iter = m_endIter;
@@ -407,6 +407,8 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumn
     {
         int newRowToFind = m_currentLine + movement;
 
+
+
         if(newRowToFind < 0)
         {
             m_currentLine = 0;
@@ -414,11 +416,15 @@ inline blTextColumnVectorIterator<blDataIteratorType,blNumberType>& blTextColumn
         }
         else
         {
-            m_currentLine = blAlgorithmsLIB::findBeginningOfNthDataRow(m_beginIter,m_endIter,'\n',false,newRowToFind,m_iter);
+            m_currentLine = findBeginningOfNthDataRow(m_beginIter,m_endIter,'\n',false,newRowToFind,m_iter);
         }
+
+
 
         convertToNumberFromCurrentPosition();
     }
+
+
 
     return (*this);
 }

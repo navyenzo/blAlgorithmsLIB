@@ -808,6 +808,8 @@ inline blIntegerType findBeginningOfNthDataRow(const blDataIteratorType& beginIt
         return blIntegerType(0);
     }
 
+
+
     // The iterator
     // to the tokens
     // found in the data
@@ -830,9 +832,11 @@ inline blIntegerType findBeginningOfNthDataRow(const blDataIteratorType& beginIt
         // data
 
         secondTokenIterator = find(firstTokenIterator,
-                                   endIter,
-                                   rowToken,
-                                   0);
+                                       endIter,
+                                       rowToken,
+                                       0);
+
+
 
         if(secondTokenIterator == firstTokenIterator &&
            !shouldZeroLengthRowsBeCounted)
