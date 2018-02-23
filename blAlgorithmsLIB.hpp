@@ -35,6 +35,12 @@
 
 //-------------------------------------------------------------------
 
+// Constants and Enums needed throughout the blAlgorithmsLIB library
+
+#include "blConstantsAndEnums.hpp"
+
+
+
 // Generic function that simplify reading from a stream
 // into a variable or a contiguous buffer and writing to
 // a stream from a variable or a contiguous buffer
@@ -81,6 +87,13 @@
 // to a number
 
 #include "blConvertToNumber.hpp"
+
+
+
+// Custom iterator useful in parsing data from csv files
+// and making it addressable like a numeric matrix
+
+#include "blCSVMatrixIterator.hpp"
 
 
 

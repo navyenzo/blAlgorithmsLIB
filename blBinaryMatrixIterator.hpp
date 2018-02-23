@@ -91,18 +91,6 @@ namespace blAlgorithmsLIB
 
 
 //-------------------------------------------------------------------
-// Enum used to decide how to advance the iterator
-// throught the user supplied binary data stream
-//-------------------------------------------------------------------
-enum blAdvancingIteratorMethod {COL_MAJOR = 0,
-                                ROW_MAJOR = 1,
-                                COL_PAGE_MAJOR = 2,
-                                ROW_PAGE_MAJOR = 3};
-//-------------------------------------------------------------------
-
-
-
-//-------------------------------------------------------------------
 template<typename blDataIteratorType,
          typename blNumberType>
 
@@ -405,14 +393,6 @@ protected: // Protected variables
 
     // Variable used to decide how to advance
     // the iterator
-    //
-    // 0: column-major advancement
-    //    ++ moves from one column
-    //    to the next one
-    //
-    // 1: row-major advancement
-    //    ++ moves from one row to
-    //    the next one
 
     blAdvancingIteratorMethod                                           m_advancingIteratorMethod;
 };

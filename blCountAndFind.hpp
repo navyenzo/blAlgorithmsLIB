@@ -62,9 +62,9 @@ template<typename blDataIteratorType,
          typename blTokenType>
 
 inline std::size_t countDataRows(const blDataIteratorType& beginIter,
-                            const blDataIteratorType& endIter,
-                            const blTokenType& rowToken,
-                            const bool& shouldZeroLengthRowsBeCounted)
+                                 const blDataIteratorType& endIter,
+                                 const blTokenType& rowToken,
+                                 const bool& shouldZeroLengthRowsBeCounted)
 {
     // Check the inputs
 
@@ -95,98 +95,10 @@ inline std::size_t countDataRows(const blDataIteratorType& beginIter,
         // token in the
         // data
 
-        secondTokenIterator = find(firstTokenIterator,
-                                   endIter,
-                                   rowToken,
-                                   0);
-
-        if(secondTokenIterator == firstTokenIterator &&
-           !shouldZeroLengthRowsBeCounted)
-        {
-            // In this case,
-            // we do not want
-            // to count this
-            // as a data row
-
-            ++firstTokenIterator;
-        }
-        else
-        {
-            // Increse the total
-            // number of rows
-
-            ++totalNumberOfRows;
-
-            firstTokenIterator = secondTokenIterator;
-
-            // Advance the iterator
-            // if we've not reached
-            // the end yet
-
-            if(firstTokenIterator != endIter)
-                ++firstTokenIterator;
-
-            // In case of circular
-            // iterators we might
-            // be back to the
-            // beginning, so we
-            // quit in that case
-
-            if(firstTokenIterator == beginIter)
-                break;
-        }
-    }
-
-    // We're done counting
-
-    return totalNumberOfRows;
-}
-
-
-template<typename blDataIteratorType,
-         typename blTokenType,
-         typename blPredicateFunctorType>
-
-inline std::size_t countDataRows(const blDataIteratorType& beginIter,
-                            const blDataIteratorType& endIter,
-                            const blTokenType& rowToken,
-                            const bool& shouldZeroLengthRowsBeCounted,
-                            const blPredicateFunctorType& predicateFunctor)
-{
-    // Check the inputs
-
-    if(beginIter == endIter)
-    {
-        // In this case there
-        // are no rows
-
-        return std::size_t(0);
-    }
-
-    // Iterators used to
-    // find the tokens in
-    // the data buffer
-
-    blDataIteratorType firstTokenIterator = beginIter;
-    blDataIteratorType secondTokenIterator = beginIter;
-
-    // The total number
-    // of rows found by
-    // this function
-
-    std::size_t totalNumberOfRows = std::size_t(0);
-
-    while(firstTokenIterator != endIter)
-    {
-        // Find the next
-        // token in the
-        // data
-
-        secondTokenIterator = find(firstTokenIterator,
-                                   endIter,
-                                   rowToken,
-                                   0,
-                                   predicateFunctor);
+        secondTokenIterator = blAlgorithmsLIB::find(firstTokenIterator,
+                                                    endIter,
+                                                    rowToken,
+                                                    0);
 
         if(secondTokenIterator == firstTokenIterator &&
            !shouldZeroLengthRowsBeCounted)
@@ -230,6 +142,289 @@ inline std::size_t countDataRows(const blDataIteratorType& beginIter,
     return totalNumberOfRows;
 }
 //-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Overload with predicate functor
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blTokenType,
+         typename blPredicateFunctorType>
+
+inline std::size_t countDataRows(const blDataIteratorType& beginIter,
+                                 const blDataIteratorType& endIter,
+                                 const blTokenType& rowToken,
+                                 const bool& shouldZeroLengthRowsBeCounted,
+                                 const blPredicateFunctorType& predicateFunctor)
+{
+    // Check the inputs
+
+    if(beginIter == endIter)
+    {
+        // In this case there
+        // are no rows
+
+        return std::size_t(0);
+    }
+
+    // Iterators used to
+    // find the tokens in
+    // the data buffer
+
+    blDataIteratorType firstTokenIterator = beginIter;
+    blDataIteratorType secondTokenIterator = beginIter;
+
+    // The total number
+    // of rows found by
+    // this function
+
+    std::size_t totalNumberOfRows = std::size_t(0);
+
+    while(firstTokenIterator != endIter)
+    {
+        // Find the next
+        // token in the
+        // data
+
+        secondTokenIterator = blAlgorithmsLIB::find(firstTokenIterator,
+                                                    endIter,
+                                                    rowToken,
+                                                    0,
+                                                    predicateFunctor);
+
+        if(secondTokenIterator == firstTokenIterator &&
+           !shouldZeroLengthRowsBeCounted)
+        {
+            // In this case,
+            // we do not want
+            // to count this
+            // as a data row
+
+            ++firstTokenIterator;
+        }
+        else
+        {
+            // Increse the total
+            // number of rows
+
+            ++totalNumberOfRows;
+
+            firstTokenIterator = secondTokenIterator;
+
+            // Advance the iterator
+            // if we've not reached
+            // the end yet
+
+            if(firstTokenIterator != endIter)
+                ++firstTokenIterator;
+
+            // In case of circular
+            // iterators we might
+            // be back to the
+            // beginning, so we
+            // quit in that case
+
+            if(firstTokenIterator == beginIter)
+                break;
+        }
+    }
+
+    // We're done counting
+
+    return totalNumberOfRows;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// The following functions count the number of
+// data rows in a buffer by searching for "data row"
+// tokens in the buffer
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blTokenIteratorType>
+
+inline std::size_t countDataRows(const blDataIteratorType& beginIter,
+                                 const blDataIteratorType& endIter,
+                                 const blTokenIteratorType& rowTokensBeginIter,
+                                 const blTokenIteratorType& rowTokensEndIter,
+                                 const bool& shouldZeroLengthRowsBeCounted)
+{
+    // Check the inputs
+
+    if(beginIter == endIter)
+    {
+        // In this case there
+        // are no rows
+
+        return std::size_t(0);
+    }
+
+    // Iterators used to
+    // find the tokens in
+    // the data buffer
+
+    blDataIteratorType firstTokenIterator = beginIter;
+    blDataIteratorType secondTokenIterator = beginIter;
+
+    // The total number
+    // of rows found by
+    // this function
+
+    std::size_t totalNumberOfRows = std::size_t(0);
+
+    while(firstTokenIterator != endIter)
+    {
+        // Find the next
+        // token in the
+        // data
+
+        secondTokenIterator = blAlgorithmsLIB::find_first_of(firstTokenIterator,
+                                                             endIter,
+                                                             rowTokensBeginIter,
+                                                             rowTokensEndIter,
+                                                             0);
+
+        if(secondTokenIterator == firstTokenIterator &&
+           !shouldZeroLengthRowsBeCounted)
+        {
+            // In this case,
+            // we do not want
+            // to count this
+            // as a data row
+
+            ++firstTokenIterator;
+        }
+        else
+        {
+            // Increse the total
+            // number of rows
+
+            ++totalNumberOfRows;
+
+            firstTokenIterator = secondTokenIterator;
+
+            // Advance the iterator
+            // if we've not reached
+            // the end yet
+
+            if(firstTokenIterator != endIter)
+                ++firstTokenIterator;
+
+            // In case of circular
+            // iterators we might
+            // be back to the
+            // beginning, so we
+            // quit in that case
+
+            if(firstTokenIterator == beginIter)
+                break;
+        }
+    }
+
+    // We're done counting
+
+    return totalNumberOfRows;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Overload with predicate functor
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blTokenIteratorType,
+         typename blPredicateFunctorType>
+
+inline std::size_t countDataRows(const blDataIteratorType& beginIter,
+                                 const blDataIteratorType& endIter,
+                                 const blTokenIteratorType& rowTokensBeginIter,
+                                 const blTokenIteratorType& rowTokensEndIter,
+                                 const bool& shouldZeroLengthRowsBeCounted,
+                                 const blPredicateFunctorType& predicateFunctor)
+{
+    // Check the inputs
+
+    if(beginIter == endIter)
+    {
+        // In this case there
+        // are no rows
+
+        return std::size_t(0);
+    }
+
+    // Iterators used to
+    // find the tokens in
+    // the data buffer
+
+    blDataIteratorType firstTokenIterator = beginIter;
+    blDataIteratorType secondTokenIterator = beginIter;
+
+    // The total number
+    // of rows found by
+    // this function
+
+    std::size_t totalNumberOfRows = std::size_t(0);
+
+    while(firstTokenIterator != endIter)
+    {
+        // Find the next
+        // token in the
+        // data
+
+        secondTokenIterator = blAlgorithmsLIB::find_first_of(firstTokenIterator,
+                                                             endIter,
+                                                             rowTokensBeginIter,
+                                                             rowTokensEndIter,
+                                                             0,
+                                                             predicateFunctor);
+
+        if(secondTokenIterator == firstTokenIterator &&
+           !shouldZeroLengthRowsBeCounted)
+        {
+            // In this case,
+            // we do not want
+            // to count this
+            // as a data row
+
+            ++firstTokenIterator;
+        }
+        else
+        {
+            // Increse the total
+            // number of rows
+
+            ++totalNumberOfRows;
+
+            firstTokenIterator = secondTokenIterator;
+
+            // Advance the iterator
+            // if we've not reached
+            // the end yet
+
+            if(firstTokenIterator != endIter)
+                ++firstTokenIterator;
+
+            // In case of circular
+            // iterators we might
+            // be back to the
+            // beginning, so we
+            // quit in that case
+
+            if(firstTokenIterator == beginIter)
+                break;
+        }
+    }
+
+    // We're done counting
+
+    return totalNumberOfRows;
+}
+//-------------------------------------------------------------------
+
 
 
 //-------------------------------------------------------------------
@@ -242,8 +437,8 @@ template<typename blDataIteratorType,
          typename blTokenType>
 
 inline std::size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
-                                         const blDataIteratorType& endIter,
-                                         const blTokenType& rowToken)
+                                              const blDataIteratorType& endIter,
+                                              const blTokenType& rowToken)
 {
     // Check the inputs
 
@@ -323,16 +518,21 @@ inline std::size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIte
 
     return longestLength;
 }
+//-------------------------------------------------------------------
 
 
+
+//-------------------------------------------------------------------
+// Overload with predicate functor
+//-------------------------------------------------------------------
 template<typename blDataIteratorType,
          typename blTokenType,
          typename blPredicateFunctorType>
 
 inline std::size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIter,
-                                         const blDataIteratorType& endIter,
-                                         const blTokenType& rowToken,
-                                         const blPredicateFunctorType& predicateFunctor)
+                                              const blDataIteratorType& endIter,
+                                              const blTokenType& rowToken,
+                                              const blPredicateFunctorType& predicateFunctor)
 {
     // Check the inputs
     if(beginIter == endIter)
@@ -415,10 +615,10 @@ inline std::size_t findLengthOfLongestDataRow(const blDataIteratorType& beginIte
 //-------------------------------------------------------------------
 
 
+
 //-------------------------------------------------------------------
-// The following functions count the total
-// number of rows in a buffer together with
-// the length of the longest row
+// The following function counts the total number of rows in a
+// buffer together with the length of the longest row
 //-------------------------------------------------------------------
 template<typename blDataIteratorType,
          typename blTokenType,
@@ -440,6 +640,8 @@ inline blDataIteratorType countDataRowsAndLongestRowLength(const blDataIteratorT
 
         return endIter;
     }
+
+
 
     // The iterators to
     // the tokens found
@@ -532,8 +734,13 @@ inline blDataIteratorType countDataRowsAndLongestRowLength(const blDataIteratorT
 
     return iteratorToBeginningOfLongestDataRow;
 }
+//-------------------------------------------------------------------
 
 
+
+//-------------------------------------------------------------------
+// Overload with predicate functor
+//-------------------------------------------------------------------
 template<typename blDataIteratorType,
          typename blTokenType,
          typename blIntegerType,
@@ -557,6 +764,8 @@ inline blDataIteratorType countDataRowsAndLongestRowLength(const blDataIteratorT
         return endIter;
     }
 
+
+
     // The iterators to
     // the tokens found
     // in the data buffer
@@ -650,6 +859,7 @@ inline blDataIteratorType countDataRowsAndLongestRowLength(const blDataIteratorT
     return iteratorToBeginningOfLongestDataRow;
 }
 //-------------------------------------------------------------------
+
 
 
 //-------------------------------------------------------------------
@@ -777,6 +987,7 @@ inline void getRowAndColNumberOfPositionInDataBuffer(const blDataIteratorType& b
 //-------------------------------------------------------------------
 
 
+
 //-------------------------------------------------------------------
 // This function gets an iterator to the
 // beginning of the user specified nth row.
@@ -832,9 +1043,9 @@ inline blIntegerType findBeginningOfNthDataRow(const blDataIteratorType& beginIt
         // data
 
         secondTokenIterator = find(firstTokenIterator,
-                                       endIter,
-                                       rowToken,
-                                       0);
+                                   endIter,
+                                   rowToken,
+                                   0);
 
 
 
@@ -871,6 +1082,115 @@ inline blIntegerType findBeginningOfNthDataRow(const blDataIteratorType& beginIt
     return currentRow;
 }
 //-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// This function gets an iterator to the
+// beginning of the user specified nth data point.
+// The function returns the "actual" data point index found
+// in case that there are less than "n" data points.
+// The difference from the above function is that
+// this function takes a user specified list of tokens
+// instead of a single token
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blTokenIteratorType,
+         typename blIntegerType>
+
+inline blIntegerType findBeginningOfNthDataPoint(const blDataIteratorType& dataBeginIter,
+                                                 const blDataIteratorType& dataEndIter,
+                                                 const blTokenIteratorType& tokenListBeginIter,
+                                                 const blTokenIteratorType& tokenListEndIter,
+                                                 const bool& shouldZeroLengthRowsBeCounted,
+                                                 const blIntegerType& whichDataPointToFind,
+                                                 blDataIteratorType& nthDataPointBeginIter)
+{
+    // Check the inputs
+
+    if(dataBeginIter == dataEndIter)
+    {
+        // In this case
+        // we have no
+        // data to look
+        // through
+
+        nthDataPointBeginIter = dataBeginIter;
+
+        return blIntegerType(-1);
+    }
+
+
+
+    // The iterator
+    // to the tokens
+    // found in the data
+
+    blDataIteratorType firstTokenIterator = dataBeginIter;
+    blDataIteratorType secondTokenIterator = dataBeginIter;
+
+    nthDataPointBeginIter = firstTokenIterator;
+
+
+
+    // The current
+    // data point
+
+    blIntegerType currentDataPoint = blIntegerType(-1);
+
+
+
+    while(firstTokenIterator != dataEndIter &&
+          currentDataPoint < whichDataPointToFind)
+    {
+        // Find the next
+        // token in the
+        // data
+
+        secondTokenIterator = blAlgorithmsLIB::find_first_of(firstTokenIterator,
+                                                             dataEndIter,
+                                                             tokenListBeginIter,
+                                                             tokenListEndIter,
+                                                             0);
+
+
+
+        if(secondTokenIterator == firstTokenIterator &&
+           !shouldZeroLengthRowsBeCounted)
+        {
+            // In this case,
+            // the row is of
+            // zero length and
+            // we don't count it
+
+            ++firstTokenIterator;
+        }
+        else
+        {
+            ++currentDataPoint;
+
+            nthDataPointBeginIter = firstTokenIterator;
+
+            firstTokenIterator = secondTokenIterator;
+
+            // If we have not
+            // reached the end,
+            // then we advance
+            // the iterator
+
+            if(firstTokenIterator != dataEndIter)
+                ++firstTokenIterator;
+        }
+    }
+
+
+
+    // We're done
+
+    return currentDataPoint;
+}
+//-------------------------------------------------------------------
+
 
 
 //-------------------------------------------------------------------
@@ -971,6 +1291,7 @@ inline blIntegerType findBeginAndEndOfNthDataRow(const blDataIteratorType& begin
 //-------------------------------------------------------------------
 
 
+
 //-------------------------------------------------------------------
 // This function, just like the one above
 // finds the beginning and end of the user
@@ -1009,6 +1330,115 @@ inline blIntegerType findBeginAndEndOfNthDataRow2(const blDataIteratorType& begi
     return actualRowFound;
 }
 //-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// This function gets an iterator to the
+// beginning and to the end of the user specified nth data point.
+// The function returns the "actual" data point index found
+// in case that there are less than "n" data points.
+// The difference from the above function is that
+// this function takes a user specified list of tokens
+// instead of a single token
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blTokenIteratorType,
+         typename blIntegerType>
+
+inline blIntegerType findBeginAndEndOfNthDataPoint(const blDataIteratorType& dataBeginIter,
+                                                   const blDataIteratorType& dataEndIter,
+                                                   const blTokenIteratorType& tokenListBeginIter,
+                                                   const blTokenIteratorType& tokenListEndIter,
+                                                   const bool& shouldZeroLengthRowsBeCounted,
+                                                   const blIntegerType& whichDataPointToFind,
+                                                   blDataIteratorType& nthDataPointBeginIter,
+                                                   blDataIteratorType& nthDataPointEndIter)
+{
+    // Check the inputs
+
+    if(dataBeginIter == dataEndIter)
+    {
+        // In this case
+        // we have no
+        // data to look
+        // through
+
+        nthDataPointBeginIter = dataBeginIter;
+        nthDataPointEndIter = dataBeginIter;
+
+        return blIntegerType(0);
+    }
+
+
+
+    // The iterator
+    // to the tokens
+    // found in the data
+
+    blDataIteratorType firstTokenIterator = dataBeginIter;
+    blDataIteratorType secondTokenIterator = dataBeginIter;
+
+    nthDataPointBeginIter = firstTokenIterator;
+    nthDataPointEndIter = firstTokenIterator;
+
+
+
+    // The current
+    // data point
+
+    blIntegerType currentDataPoint = blIntegerType(-1);
+
+    while(firstTokenIterator != dataEndIter &&
+          currentDataPoint < whichDataPointToFind)
+    {
+        // Find the next
+        // token in the
+        // data
+
+        secondTokenIterator = blAlgorithmsLIB::find_first_of(firstTokenIterator,
+                                                             dataEndIter,
+                                                             tokenListBeginIter,
+                                                             tokenListEndIter,
+                                                             0);
+
+        if(secondTokenIterator == firstTokenIterator &&
+           !shouldZeroLengthRowsBeCounted)
+        {
+            // In this case,
+            // the row is of
+            // zero length and
+            // we don't count it
+
+            ++firstTokenIterator;
+        }
+        else
+        {
+            ++currentDataPoint;
+
+            nthDataPointBeginIter = firstTokenIterator;
+            nthDataPointEndIter = secondTokenIterator;
+
+            firstTokenIterator = secondTokenIterator;
+
+            // If we have not
+            // reached the end,
+            // then we advance
+            // the iterator
+
+            if(firstTokenIterator != dataEndIter)
+                ++firstTokenIterator;
+        }
+    }
+
+
+
+    // We're done
+
+    return currentDataPoint;
+}
+//-------------------------------------------------------------------
+
 
 
 //-------------------------------------------------------------------
@@ -1118,6 +1548,7 @@ inline blDataIteratorType findIterToNthDataRowAndMthDataCol(const blDataIterator
 //-------------------------------------------------------------------
 
 
+
 //-------------------------------------------------------------------
 // This function gets the position in the
 // data buffer of a data point specified
@@ -1182,6 +1613,7 @@ inline blIntegerType findPositionOfNthDataRowAndMthDataCol(const blDataIteratorT
     return std::distance(beginIter,iteratorToPositionOfNthRowAndMthColumn);
 }
 //-------------------------------------------------------------------
+
 
 
 //-------------------------------------------------------------------
