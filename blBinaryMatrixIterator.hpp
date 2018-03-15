@@ -569,7 +569,7 @@ inline blBinaryMatrixIterator<blDataIteratorType,blNumberType>& blBinaryMatrixIt
     if(m_size == 0)
         m_iter = m_endIter;
     else
-        m_iter = m_beginIter + ( (m_currentIndex + 3) * sizeof(blNumberType) );
+        m_iter = m_beginIter + 3*sizeof(blNumberType);
 
     m_currentIndex = 0;
     m_currentRow = 0;
