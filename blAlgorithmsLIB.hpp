@@ -90,6 +90,12 @@
 
 
 
+// Functions useful in manipulating strings
+
+#include "blStringManipulation.hpp"
+
+
+
 // Custom iterator useful in parsing data from csv files
 // and making it addressable like a numeric matrix
 
