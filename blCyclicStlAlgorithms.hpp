@@ -617,6 +617,44 @@ inline blBufferIteratorType find_first_not_of(const blBufferIteratorType& buffer
 
 
 //-------------------------------------------------------------------
+// The following function searches for a sequence within a
+// user specified buffer and returns the iterator to the
+// beginning of the sequence
+//-------------------------------------------------------------------
+template<typename blBufferIteratorType,
+         typename blSequenceIteratorType>
+
+inline blBufferIteratorType search(const blBufferIteratorType& bufferBeginIter,
+                                   const blBufferIteratorType& bufferEndIter,
+                                   const blSequenceIteratorType& sequenceBeginIter,
+                                   const blSequenceIteratorType& sequenceEndIter)
+{
+    for(auto bufferIter = bufferBeginIter;
+        bufferIter != bufferEndIter;
+        ++bufferIter)
+    {
+        auto bufferCheckIter = bufferIter;
+
+        for(auto sequenceIter = sequenceBeginIter;
+            sequenceIter != sequenceEndIter;
+            ++sequenceIter,++bufferCheckIter)
+        {
+            if(sequenceIter == sequenceEndIter)
+                return bufferIter;
+            else if(bufferCheckIter == bufferEndIter)
+                return bufferEndIter;
+            else if(*bufferCheckIter != *sequenceIter)
+                break;
+        }
+    }
+
+    return bufferEndIter;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 // End of namespace
 }
 //-------------------------------------------------------------------
