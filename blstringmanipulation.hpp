@@ -46,6 +46,72 @@ namespace blAlgorithmsLIB
 
 
 //-------------------------------------------------------------------
+// Functions used to search for substrings in a user
+// specified string
+//-------------------------------------------------------------------
+template<typename blContainerType,
+         typename blStringType>
+
+inline bool is_in_container(const blContainerType& container,
+                            const blStringType& stringToSearchFor)
+{
+    return ( blAlgorithmsLIB::search(container.begin(),container.end(),stringToSearchFor.begin(),stringToSearchFor.end()) != container.end());
+}
+
+
+
+template<typename blContainerType,
+         typename blStringType>
+
+inline auto search_in_container(const blContainerType& container,
+                                const blStringType& stringToSearchFor)
+{
+    return blAlgorithmsLIB::search(container.begin(),container.end(),stringToSearchFor.begin(),stringToSearchFor.end());
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Functions used to know whether a container starts/ends
+// with a specified string
+//-------------------------------------------------------------------
+template<typename blContainerType,
+         typename blStringType>
+
+inline bool starts_with(const blContainerType& container,
+                        const blStringType& stringToSearchFor)
+{
+    return blAlgorithmsLIB::is_partially_equal(container.begin(),
+                                               container.end(),
+                                               stringToSearchFor.begin(),
+                                               stringToSearchFor.end());
+}
+
+
+
+template<typename blContainerType,
+         typename blStringType>
+
+inline bool ends_with(const blContainerType& container,
+                      const blStringType& stringToSearchFor)
+{
+    if(container.size() < stringToSearchFor.size())
+        return false;
+
+    auto containerBeginIter = container.begin;
+    std::advance(containerBeginIter,container.size() - stringToSearchFor.size());
+
+    return blAlgorithmsLIB::is_partially_equal(containerBeginIter,
+                                               container.end(),
+                                               stringToSearchFor.begin(),
+                                               stringToSearchFor.end());
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 // Function used to replace all substrings matching a user
 // specified "old substring" with a user specified "new substring"
 //-------------------------------------------------------------------

@@ -49,14 +49,6 @@
 
 
 
-// Generic functions check whether two buffers
-// are equal or whether they are partially equal
-// to each other.
-
-#include "blCheckForEquality.hpp"
-
-
-
 // Cyclic versions of common stl-algorithms such
 // as std::copy and std::find but with a parameter
 // that allows a user to specify the maximum

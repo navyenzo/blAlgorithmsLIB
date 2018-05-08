@@ -142,6 +142,219 @@ inline blBuffer2IteratorType copy(const blBuffer1IteratorType& inputBegin,
 
 
 //-------------------------------------------------------------------
+// The following function checks two buffers to see if they are
+// partially equal
+//-------------------------------------------------------------------
+template<typename blBuffer1IteratorType,
+         typename blBuffer2IteratorType>
+
+inline bool is_partially_equal(const blBuffer1IteratorType& beginOfBufferToCheck,
+                               const blBuffer1IteratorType& endOfBufferToCheck,
+                               const blBuffer2IteratorType& beginOfBufferToCheckAgainst,
+                               const blBuffer2IteratorType& endOfBufferToCheckAgainst)
+{
+    auto bufferToCheckIter = beginOfBufferToCheck;
+    auto bufferToCheckAgainstIter = beginOfBufferToCheckAgainst;
+
+    std::ptrdiff_t numberOfRepeatsforBufferToCheck = 0;
+    std::ptrdiff_t numberOfRepeatsforBufferToCheckAgainst = 0;
+
+
+
+    while(bufferToCheckIter != endOfBufferToCheck &&
+          bufferToCheckAgainstIter != endOfBufferToCheckAgainst &&
+          numberOfRepeatsforBufferToCheck < 1 &&
+          numberOfRepeatsforBufferToCheckAgainst < 1)
+    {
+        if(*bufferToCheckIter != *bufferToCheckAgainstIter)
+            return false;
+
+        ++bufferToCheckIter;
+        ++bufferToCheckAgainstIter;
+
+        if(bufferToCheckIter == beginOfBufferToCheck)
+            ++numberOfRepeatsforBufferToCheck;
+
+        if(bufferToCheckAgainstIter == beginOfBufferToCheckAgainst)
+            ++numberOfRepeatsforBufferToCheckAgainst;
+    }
+
+
+
+    if(bufferToCheckIter == endOfBufferToCheck)
+        return true;
+
+    if(numberOfRepeatsforBufferToCheck >= numberOfRepeatsforBufferToCheckAgainst)
+        return true;
+
+    return false;
+}
+
+
+
+//-------------------------------------------------------------------
+// Overload with predicate functor
+//-------------------------------------------------------------------
+
+
+
+template<typename blBuffer1IteratorType,
+         typename blBuffer2IteratorType,
+         typename blPredicateFunctorType>
+
+inline bool is_partially_equal(blBuffer1IteratorType beginOfBufferToCheck,
+                               const blBuffer1IteratorType& endOfBufferToCheck,
+                               blBuffer2IteratorType beginOfBufferToCheckAgainst,
+                               const blBuffer2IteratorType& endOfBufferToCheckAgainst,
+                               const blPredicateFunctorType& predicateFunctor)
+{
+    auto bufferToCheckIter = beginOfBufferToCheck;
+    auto bufferToCheckAgainstIter = beginOfBufferToCheckAgainst;
+
+    std::ptrdiff_t numberOfRepeatsforBufferToCheck = 0;
+    std::ptrdiff_t numberOfRepeatsforBufferToCheckAgainst = 0;
+
+
+
+    while(bufferToCheckIter != endOfBufferToCheck &&
+          bufferToCheckAgainstIter != endOfBufferToCheckAgainst &&
+          numberOfRepeatsforBufferToCheck < 1 &&
+          numberOfRepeatsforBufferToCheckAgainst < 1)
+    {
+        if(!predicateFunctor(*beginOfBufferToCheck,*beginOfBufferToCheckAgainst))
+            return false;
+
+        ++bufferToCheckIter;
+        ++bufferToCheckAgainstIter;
+
+        if(bufferToCheckIter == beginOfBufferToCheck)
+            ++numberOfRepeatsforBufferToCheck;
+
+        if(bufferToCheckAgainstIter == beginOfBufferToCheckAgainst)
+            ++numberOfRepeatsforBufferToCheckAgainst;
+    }
+
+
+
+    if(bufferToCheckIter == endOfBufferToCheck)
+        return true;
+
+    if(numberOfRepeatsforBufferToCheck >= numberOfRepeatsforBufferToCheckAgainst)
+        return true;
+
+    return false;
+}
+//-------------------------------------------------------------------
+
+
+//-------------------------------------------------------------------
+// The following functions check if
+// two buffers are equal
+//-------------------------------------------------------------------
+template<typename blBuffer1IteratorType,
+         typename blBuffer2IteratorType>
+
+inline bool is_equal(blBuffer1IteratorType beginOfBufferToCheck,
+                     const blBuffer1IteratorType& endOfBufferToCheck,
+                     blBuffer2IteratorType beginOfBufferToCheckAgainst,
+                     const blBuffer2IteratorType& endOfBufferToCheckAgainst)
+{
+    auto bufferToCheckIter = beginOfBufferToCheck;
+    auto bufferToCheckAgainstIter = beginOfBufferToCheckAgainst;
+
+    std::ptrdiff_t numberOfRepeatsforBufferToCheck = 0;
+    std::ptrdiff_t numberOfRepeatsforBufferToCheckAgainst = 0;
+
+
+
+    while(bufferToCheckIter != endOfBufferToCheck &&
+          bufferToCheckAgainstIter != endOfBufferToCheckAgainst &&
+          numberOfRepeatsforBufferToCheck < 1 &&
+          numberOfRepeatsforBufferToCheckAgainst < 1)
+    {
+        if(*bufferToCheckIter != *bufferToCheckAgainstIter)
+            return false;
+
+        ++bufferToCheckIter;
+        ++bufferToCheckAgainstIter;
+
+        if(bufferToCheckIter == beginOfBufferToCheck)
+            ++numberOfRepeatsforBufferToCheck;
+
+        if(bufferToCheckAgainstIter == beginOfBufferToCheckAgainst)
+            ++numberOfRepeatsforBufferToCheckAgainst;
+    }
+
+
+
+    if(bufferToCheckIter == endOfBufferToCheck &&
+       bufferToCheckAgainstIter == endOfBufferToCheckAgainst)
+    {
+        return true;
+    }
+
+    if(numberOfRepeatsforBufferToCheck == numberOfRepeatsforBufferToCheckAgainst)
+        return true;
+
+    return false;
+}
+
+
+
+template<typename blBuffer1IteratorType,
+         typename blBuffer2IteratorType,
+         typename blPredicateFunctorType>
+
+inline bool is_equal(blBuffer1IteratorType beginOfBufferToCheck,
+                     const blBuffer1IteratorType& endOfBufferToCheck,
+                     blBuffer2IteratorType beginOfBufferToCheckAgainst,
+                     const blBuffer2IteratorType& endOfBufferToCheckAgainst,
+                     const blPredicateFunctorType& predicateFunctor)
+{
+    auto bufferToCheckIter = beginOfBufferToCheck;
+    auto bufferToCheckAgainstIter = beginOfBufferToCheckAgainst;
+
+    std::ptrdiff_t numberOfRepeatsforBufferToCheck = 0;
+    std::ptrdiff_t numberOfRepeatsforBufferToCheckAgainst = 0;
+
+
+
+    while(bufferToCheckIter != endOfBufferToCheck &&
+          bufferToCheckAgainstIter != endOfBufferToCheckAgainst &&
+          numberOfRepeatsforBufferToCheck < 1 &&
+          numberOfRepeatsforBufferToCheckAgainst < 1)
+    {
+        if(!predicateFunctor(*beginOfBufferToCheck,*beginOfBufferToCheckAgainst))
+            return false;
+
+        ++bufferToCheckIter;
+        ++bufferToCheckAgainstIter;
+
+        if(bufferToCheckIter == beginOfBufferToCheck)
+            ++numberOfRepeatsforBufferToCheck;
+
+        if(bufferToCheckAgainstIter == beginOfBufferToCheckAgainst)
+            ++numberOfRepeatsforBufferToCheckAgainst;
+    }
+
+
+
+    if(bufferToCheckIter == endOfBufferToCheck &&
+       bufferToCheckAgainstIter == endOfBufferToCheckAgainst)
+    {
+        return true;
+    }
+
+    if(numberOfRepeatsforBufferToCheck == numberOfRepeatsforBufferToCheckAgainst)
+        return true;
+
+    return false;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
 // The following function searches for tokens in a buffer
 //-------------------------------------------------------------------
 template<typename blTokenType,
@@ -629,24 +842,37 @@ inline blBufferIteratorType search(const blBufferIteratorType& bufferBeginIter,
                                    const blSequenceIteratorType& sequenceBeginIter,
                                    const blSequenceIteratorType& sequenceEndIter)
 {
-    for(auto bufferIter = bufferBeginIter;
-        bufferIter != bufferEndIter;
-        ++bufferIter)
-    {
-        auto bufferCheckIter = bufferIter;
+    auto bufferCurrentIter = bufferBeginIter;
+    auto bufferCheckIter = bufferCurrentIter;
+    blSequenceIteratorType sequenceIter = sequenceBeginIter;
+    std::ptrdiff_t numberOfRepeats = 0;
 
-        for(auto sequenceIter = sequenceBeginIter;
-            sequenceIter != sequenceEndIter;
-            ++sequenceIter,++bufferCheckIter)
+
+
+    while(bufferCurrentIter != bufferEndIter &&
+          numberOfRepeats < 1)
+    {
+        bufferCheckIter = bufferCurrentIter;
+        sequenceIter = sequenceBeginIter;
+
+        while(bufferCheckIter != bufferEndIter)
         {
             if(sequenceIter == sequenceEndIter)
-                return bufferIter;
+                return bufferCurrentIter;
             else if(bufferCheckIter == bufferEndIter)
                 return bufferEndIter;
-            else if(*bufferCheckIter != *sequenceIter)
+            else if(*bufferCheckIter != *sequenceIter ||
+                    bufferCheckIter == bufferBeginIter)
                 break;
         }
+
+        ++bufferCurrentIter;
+
+        if(bufferCurrentIter == bufferBeginIter)
+            ++numberOfRepeats;
     }
+
+
 
     return bufferEndIter;
 }
