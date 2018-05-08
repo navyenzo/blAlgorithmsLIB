@@ -99,7 +99,7 @@ inline bool ends_with(const blContainerType& container,
     if(container.size() < stringToSearchFor.size())
         return false;
 
-    auto containerBeginIter = container.begin;
+    auto containerBeginIter = container.begin();
     std::advance(containerBeginIter,container.size() - stringToSearchFor.size());
 
     return blAlgorithmsLIB::is_partially_equal(containerBeginIter,
