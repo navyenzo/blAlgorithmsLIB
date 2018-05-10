@@ -772,7 +772,7 @@ inline blBufferIteratorType find_first_not_of(const blBufferIteratorType& buffer
     while(bufferCurrentIter != bufferEndIter &&
           numberOfRepeats <= numberOfTimesToCycleIfIteratorIsCyclic)
     {
-        tokenIter = find(tokenListBeginIter,tokenListEndIter,*bufferCurrentIter,0);
+        tokenIter = blAlgorithmsLIB::find(tokenListBeginIter,tokenListEndIter,*bufferCurrentIter,0);
 
         if(tokenIter == tokenListEndIter)
             return bufferCurrentIter;

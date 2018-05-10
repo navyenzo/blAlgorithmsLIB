@@ -1016,7 +1016,7 @@ inline blIntegerType findBeginningOfNthDataRow(const blDataIteratorType& beginIt
 
         nthRowBeginIter = beginIter;
 
-        return blIntegerType(0);
+        return blIntegerType(-1);
     }
 
 
@@ -1225,7 +1225,7 @@ inline blIntegerType findBeginAndEndOfNthDataRow(const blDataIteratorType& begin
         nthRowBeginIter = beginIter;
         nthRowEndIter = beginIter;
 
-        return blIntegerType(0);
+        return blIntegerType(-1);
     }
 
     // The iterator
@@ -1367,7 +1367,7 @@ inline blIntegerType findBeginAndEndOfNthDataPoint(const blDataIteratorType& dat
         nthDataPointBeginIter = dataBeginIter;
         nthDataPointEndIter = dataBeginIter;
 
-        return blIntegerType(0);
+        return blIntegerType(-1);
     }
 
 

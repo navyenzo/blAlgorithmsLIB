@@ -53,6 +53,7 @@
 #include <vector>
 #include <cstddef>
 #include <iostream>
+#include <atomic>
 //-------------------------------------------------------------------
 
 
@@ -417,7 +418,6 @@ template<typename blDataIteratorType,
          typename blNumberType>
 
 const std::string blCSVMatrixIterator<blDataIteratorType,blNumberType>::s_digits = "-+.0123456789";
-
 //-------------------------------------------------------------------
 
 
@@ -783,27 +783,95 @@ template<typename blDataIteratorType,
 
 inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotalNumberOfRowsAndColumns()
 {
-    // First we find the beginning of the
-    // first data point by finding the first
-    // valid digit character
-    // non-token character in the csv data
+    // The first row of the csv file
+    // might contain headers instead
+    // of numerical data, therefore we
+    // search for the first row that
+    // contains purely numerical data
 
-    m_firstDataPointIter = blAlgorithmsLIB::find_first_of(m_beginIter,
-                                                          m_endIter,
-                                                          s_digits.begin(),
-                                                          s_digits.end(),
-                                                          0);
+    std::atomic_bool haveWeFoundFirstNumericalRow = false;
+
+    auto rowBeginIter = m_beginIter;
+    auto rowEndIter = m_beginIter;
+    auto previousRowBeginIter = m_beginIter;
+
+    std::string purelyNumericalRowTokens = s_digits;
+    purelyNumericalRowTokens += m_colTokens;
 
 
 
-    // We then count the number
-    // of data rows
+    while(!haveWeFoundFirstNumericalRow &&
+          rowBeginIter != m_endIter &&
+          rowEndIter != m_endIter)
+    {
+        // Here we search for the next data row
 
-    m_rows = blAlgorithmsLIB::countDataRows(m_firstDataPointIter,
-                                            m_endIter,
-                                            m_rowTokens.begin(),
-                                            m_rowTokens.end(),
-                                            false);
+        blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(previousRowBeginIter,
+                                                       m_endIter,
+                                                       m_rowTokens.begin(),
+                                                       m_rowTokens.end(),
+                                                       false,
+                                                       0,
+                                                       rowBeginIter,
+                                                       rowEndIter);
+
+
+
+        // We then check whether this newly
+        // found data row contains any non
+        // numeric characters
+
+        auto firstNonNumericalIter = blAlgorithmsLIB::find_first_not_of(rowBeginIter,rowEndIter,purelyNumericalRowTokens.begin(),purelyNumericalRowTokens.end(),0);
+
+
+        if(firstNonNumericalIter == rowEndIter)
+        {
+            // This means we found our first
+            // data row containing only numbers
+
+            m_firstDataPointIter = rowBeginIter;
+            haveWeFoundFirstNumericalRow = true;
+
+            break;
+        }
+        else
+        {
+            // This means the row we found contains
+            // non numerical characters in it, so
+            // we continue to the next data row
+
+            previousRowBeginIter = rowEndIter;
+
+            if(rowEndIter != m_endIter)
+                ++previousRowBeginIter;
+        }
+    }
+
+
+
+    // If we didn't find a purely numerical
+    // data row, then we set everything to
+    // zero and quit
+
+    if(!haveWeFoundFirstNumericalRow)
+    {
+        m_firstDataPointIter = m_endIter;
+        m_rows = 0;
+    }
+    else
+    {
+
+
+
+        // We then count the number
+        // of data rows
+
+        m_rows = blAlgorithmsLIB::countDataRows(m_firstDataPointIter,
+                                                m_endIter,
+                                                m_rowTokens.begin(),
+                                                m_rowTokens.end(),
+                                                false);
+    }
 
 
 
