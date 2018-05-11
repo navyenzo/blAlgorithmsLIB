@@ -100,9 +100,9 @@ public: // Constructors and destructor
 
     blCSVMatrixIterator(const blDataIteratorType& beginIter,
                         const blDataIteratorType& endIter,
-                        const std::string rowTokens = ";\n",
+                        const std::string rowTokens = ";\r\n",
                         const std::string colTokens = " ,",
-                        const blAdvancingIteratorMethod& advancingIteratorMethod = ROW_MAJOR);
+                        const blAdvancingIteratorMethod& advancingIteratorMethod = blAlgorithmsLIB::ROW_MAJOR);
 
 
 
@@ -789,8 +789,6 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
     // search for the first row that
     // contains purely numerical data
 
-    std::atomic_bool haveWeFoundFirstNumericalRow = false;
-
     auto rowBeginIter = m_beginIter;
     auto rowEndIter = m_beginIter;
     auto previousRowBeginIter = m_beginIter;
@@ -798,10 +796,11 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
     std::string purelyNumericalRowTokens = s_digits;
     purelyNumericalRowTokens += m_colTokens;
 
+    int currentRowIndex = 0;
 
 
-    while(!haveWeFoundFirstNumericalRow &&
-          rowBeginIter != m_endIter &&
+
+    while(rowBeginIter != m_endIter &&
           rowEndIter != m_endIter)
     {
         // Here we search for the next data row
@@ -830,8 +829,6 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
             // data row containing only numbers
 
             m_firstDataPointIter = rowBeginIter;
-            haveWeFoundFirstNumericalRow = true;
-
             break;
         }
         else
@@ -844,7 +841,11 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
 
             if(rowEndIter != m_endIter)
                 ++previousRowBeginIter;
+
+            m_firstDataPointIter = m_endIter;
         }
+
+        ++currentRowIndex;
     }
 
 
@@ -853,16 +854,10 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
     // data row, then we set everything to
     // zero and quit
 
-    if(!haveWeFoundFirstNumericalRow)
-    {
-        m_firstDataPointIter = m_endIter;
+    if(m_firstDataPointIter == m_endIter)
         m_rows = 0;
-    }
     else
     {
-
-
-
         // We then count the number
         // of data rows
 
@@ -910,9 +905,6 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
 
         // We then find the beginning and end of the
         // first data row
-
-        auto rowBeginIter = m_firstDataPointIter;
-        auto rowEndIter = m_endIter;
 
         blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(m_firstDataPointIter,
                                                        m_endIter,

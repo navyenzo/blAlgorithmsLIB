@@ -697,6 +697,9 @@ inline blBufferIteratorType find_first_of(const blBufferIteratorType& bufferBegi
             return bufferCurrentIter;
 
         ++bufferCurrentIter;
+
+        if(bufferCurrentIter == bufferBeginIter)
+            ++numberOfRepeats;
     }
 
 
@@ -738,6 +741,9 @@ inline blBufferIteratorType find_first_of(const blBufferIteratorType& bufferBegi
             return bufferCurrentIter;
 
         ++bufferCurrentIter;
+
+        if(bufferCurrentIter == bufferBeginIter)
+            ++numberOfRepeats;
     }
 
 
@@ -778,6 +784,9 @@ inline blBufferIteratorType find_first_not_of(const blBufferIteratorType& buffer
             return bufferCurrentIter;
 
         ++bufferCurrentIter;
+
+        if(bufferCurrentIter == bufferBeginIter)
+            ++numberOfRepeats;
     }
 
 
@@ -819,6 +828,9 @@ inline blBufferIteratorType find_first_not_of(const blBufferIteratorType& buffer
             return bufferCurrentIter;
 
         ++bufferCurrentIter;
+
+        if(bufferCurrentIter == bufferBeginIter)
+            ++numberOfRepeats;
     }
 
 
