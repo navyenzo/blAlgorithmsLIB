@@ -165,6 +165,17 @@ public: // Public functions
 
 
 
+    // Functions used to return iterators
+    // corresponding to the begin/end positions
+
+    blTextMatrixIterator<blDataIteratorType,blNumberType>       begin()const;
+    blTextMatrixIterator<blDataIteratorType,blNumberType>       end()const;
+
+    blTextMatrixIterator<const blDataIteratorType,blNumberType> cbegin()const;
+    blTextMatrixIterator<const blDataIteratorType,blNumberType> cend()const;
+
+
+
     // Let's override the access operators so that
     // they access only the data points and not
     // the string header (serial number, rows, cols)
@@ -391,6 +402,59 @@ inline blTextMatrixIterator<blDataIteratorType,blNumberType> blTextMatrixIterato
     temp -= movement;
 
     return temp;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Functions used to return iterators
+// corresponding to the begin/end positions
+//-------------------------------------------------------------------
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blTextMatrixIterator<blDataIteratorType,blNumberType> blTextMatrixIterator<blDataIteratorType,blNumberType>::begin()const
+{
+    blTextMatrixIterator<blDataIteratorType,blNumberType> beginIterator(*this);
+    beginIterator(0);
+    return beginIterator;
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blTextMatrixIterator<blDataIteratorType,blNumberType> blTextMatrixIterator<blDataIteratorType,blNumberType>::end()const
+{
+    blTextMatrixIterator<blDataIteratorType,blNumberType> endIterator(*this);
+    endIterator(endIterator.getRows() * endIterator.getCols());
+    return endIterator;
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blTextMatrixIterator<const blDataIteratorType,blNumberType> blTextMatrixIterator<blDataIteratorType,blNumberType>::cbegin()const
+{
+    blTextMatrixIterator<const blDataIteratorType,blNumberType> cbeginIterator(*this);
+    cbeginIterator(0);
+    return cbeginIterator;
+}
+
+
+
+template<typename blDataIteratorType,
+         typename blNumberType>
+
+inline blTextMatrixIterator<const blDataIteratorType,blNumberType> blTextMatrixIterator<blDataIteratorType,blNumberType>::cend()const
+{
+    blTextMatrixIterator<const blDataIteratorType,blNumberType> cendIterator(*this);
+    cendIterator(cendIterator.getRows() * cendIterator.getCols());
+    return cendIterator;
 }
 //-------------------------------------------------------------------
 
