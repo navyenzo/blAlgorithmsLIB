@@ -25,7 +25,7 @@ blDataType swapEndianess(const blDataType& value)
 
     for(int i = 0; i < sizeof(blDataType); ++i)
     {
-        reinterpret_cast<unsigned char*>(&swappedValue)[i] = reinterpret_cast<unsigned char*>(&value)[sizeof(blDataType) - 1 - i];
+        reinterpret_cast<unsigned char*>(&swappedValue)[i] = reinterpret_cast<const unsigned char*>(&value)[sizeof(blDataType) - 1 - i];
     }
 
     return swappedValue;
