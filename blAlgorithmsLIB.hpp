@@ -41,6 +41,13 @@
 
 
 
+// Algorithms useful for dealing
+// with endianess
+
+#include "blEndianess.hpp"
+
+
+
 // Generic function that simplify reading from a stream
 // into a variable or a contiguous buffer and writing to
 // a stream from a variable or a contiguous buffer
