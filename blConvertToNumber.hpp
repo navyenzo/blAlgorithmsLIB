@@ -74,7 +74,7 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
                                             const blStringIteratorType& endIter,
                                             const blCharacterType& decimalPointDelimiter,
                                             blNumberType& convertedNumber,
-                                            const int& numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter)
+                                            const int& numberOfTimesToCycleIfIteratorIsCircular)
 {
     // First we check
     // if the user
@@ -176,7 +176,7 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
                                                       endIter,
                                                       decimalPointDelimiter,
                                                       exponent,
-                                                      numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter - 1);
+                                                      numberOfTimesToCycleIfIteratorIsCircular - 1);
 
         if(newPos == currentPos)
         {
@@ -226,7 +226,7 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
     //          speaking)
 
     while((currentPos != endIter) &&
-          numberOfRepeats <= numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter)
+          numberOfRepeats <= numberOfTimesToCycleIfIteratorIsCircular)
     {
         if((*currentPos) >= '0' && (*currentPos) <= '9')
         {
@@ -301,7 +301,7 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
                                                           endIter,
                                                           decimalPointDelimiter,
                                                           exponent,
-                                                          numberOfTimesToRepeatTheSearchIfBeginIterEqualsEndIter - numberOfRepeats);
+                                                          numberOfTimesToCycleIfIteratorIsCircular - numberOfRepeats);
 
             if(newPos == currentPos)
             {

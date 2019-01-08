@@ -54,8 +54,10 @@
 #include <cstddef>
 #include <iostream>
 #include <atomic>
+#include <sstream>
 
 #include "blConstantsAndEnums.hpp"
+#include "blConvertToNumber.hpp"
 #include "blCountAndFind.hpp"
 //-------------------------------------------------------------------
 
@@ -313,15 +315,19 @@ private: // Static functions/variables/constants
 
 
 
-private: // Private functions
+protected: // Protected functions
 
 
 
-    // Function used to convert the text
-    // we're currently pointing to into
-    // a number
+    // Virtual function used to convert
+    // the text we're currently pointing
+    // to into a number
+    // This function is virtual, which means
+    // that a derived class could override
+    // it to convert the text however they
+    // desire
 
-    void                                                                convertToNumberFromCurrentPosition();
+    virtual void                                                        convertToNumberFromCurrentPosition();
 
 
 
