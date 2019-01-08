@@ -54,6 +54,9 @@
 #include <cstddef>
 #include <iostream>
 #include <atomic>
+
+#include "blConstantsAndEnums.hpp"
+#include "blCountAndFind.hpp"
 //-------------------------------------------------------------------
 
 
@@ -783,89 +786,109 @@ template<typename blDataIteratorType,
 
 inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotalNumberOfRowsAndColumns()
 {
-    // The first row of the csv file
-    // might contain headers instead
-    // of numerical data, therefore we
-    // search for the first row that
-    // contains purely numerical data
+    // Here we attempt to find the
+    // first non-empty data row
+
+    auto titleRowBeginIter = m_endIter;
+    auto titleRowEndIter = m_endIter;
 
     auto rowBeginIter = m_beginIter;
     auto rowEndIter = m_beginIter;
-    auto previousRowBeginIter = m_beginIter;
 
-    std::string purelyNumericalRowTokens = s_digits;
-    purelyNumericalRowTokens += m_colTokens;
+    int rowIndex = blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(m_beginIter,
+                                                                  m_endIter,
+                                                                  m_rowTokens.begin(),
+                                                                  m_rowTokens.end(),
+                                                                  false,
+                                                                  0,
+                                                                  rowBeginIter,
+                                                                  rowEndIter);
 
-    int currentRowIndex = 0;
 
 
+    // If we could not find a non-empty row
+    // we set everything to zero and quit
 
-    while(rowBeginIter != m_endIter &&
-          rowEndIter != m_endIter)
+    if(rowIndex < 0)
     {
-        // Here we search for the next data row
+        m_rows = 0;
+        m_cols = 0;
+        m_size = 0;
+        m_rowIndex = 0;
+        m_colIndex = 0;
+        m_dataIndex = 0;
+        m_columnNames.clear();
+        m_iter = m_endIter;
 
-        blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(previousRowBeginIter,
-                                                       m_endIter,
-                                                       m_rowTokens.begin(),
-                                                       m_rowTokens.end(),
-                                                       false,
-                                                       0,
-                                                       rowBeginIter,
-                                                       rowEndIter);
-
-
-
-        // We then check whether this newly
-        // found data row contains any non
-        // numeric characters
-
-        auto firstNonNumericalIter = blAlgorithmsLIB::find_first_not_of(rowBeginIter,rowEndIter,purelyNumericalRowTokens.begin(),purelyNumericalRowTokens.end(),0);
-
-
-        if(firstNonNumericalIter == rowEndIter)
-        {
-            // This means we found our first
-            // data row containing only numbers
-
-            m_firstDataPointIter = rowBeginIter;
-            break;
-        }
-        else
-        {
-            // This means the row we found contains
-            // non numerical characters in it, so
-            // we continue to the next data row
-
-            previousRowBeginIter = rowEndIter;
-
-            if(rowEndIter != m_endIter)
-                ++previousRowBeginIter;
-
-            m_firstDataPointIter = m_endIter;
-        }
-
-        ++currentRowIndex;
+        return;
     }
 
 
 
-    // If we didn't find a purely numerical
-    // data row, then we set everything to
-    // zero and quit
+    // Since we successfully found the first
+    // non-empty row, we now check to see
+    // if that row contains non-numeric
+    // characters, meaning it is the title
+    // row
 
-    if(m_firstDataPointIter == m_endIter)
-        m_rows = 0;
+    std::string purelyNumericalRowTokens = s_digits;
+    purelyNumericalRowTokens += m_colTokens;
+
+    auto firstNonNumericalIter = blAlgorithmsLIB::find_first_not_of(rowBeginIter,
+                                                                    rowEndIter,
+                                                                    purelyNumericalRowTokens.begin(),
+                                                                    purelyNumericalRowTokens.end(),
+                                                                    0);
+
+    if(firstNonNumericalIter == rowEndIter)
+    {
+        // This means that this csv has
+        // no title row, so we set the
+        // first data point iter to be
+        // the beginning of the first
+        // non-empty row
+
+        m_firstDataPointIter = rowBeginIter;
+    }
     else
     {
-        // We then count the number
-        // of data rows
+        // This means that this csv does
+        // have a title row, so we set the
+        // first data point iter to be the
+        // beginning of the next (second)
+        // non-empty row
 
-        m_rows = blAlgorithmsLIB::countDataRows(m_firstDataPointIter,
-                                                m_endIter,
-                                                m_rowTokens.begin(),
-                                                m_rowTokens.end(),
-                                                false);
+        titleRowBeginIter = rowBeginIter;
+        titleRowEndIter = rowEndIter;
+
+        rowIndex = blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(titleRowBeginIter,
+                                                                  m_endIter,
+                                                                  m_rowTokens.begin(),
+                                                                  m_rowTokens.end(),
+                                                                  false,
+                                                                  1,
+                                                                  rowBeginIter,
+                                                                  rowEndIter);
+
+        if(rowIndex == 1)
+            m_firstDataPointIter = rowBeginIter;
+        else
+        {
+            // This means we could not find
+            // any data rows, so we set
+            // everything to zero and quit
+
+            m_rows = 0;
+            m_cols = 0;
+            m_size = 0;
+            m_rowIndex = 0;
+            m_colIndex = 0;
+            m_dataIndex = 0;
+            m_columnNames.clear();
+            m_iter = m_endIter;
+
+            return;
+        }
     }
 
 
@@ -880,90 +903,57 @@ inline void blCSVMatrixIterator<blDataIteratorType,blNumberType>::calculateTotal
     //        column tokens (for ex. "3,,4,4,5" would be
     //        4 columns and not 5
 
-    if(m_rows <= 0)
+    m_rows = blAlgorithmsLIB::countDataRows(rowBeginIter,
+                                            m_endIter,
+                                            m_rowTokens.begin(),
+                                            m_rowTokens.end(),
+                                            false);
+
+
+
+    // We then use the first data row
+    // to count the number of data columns
+
+    m_cols = blAlgorithmsLIB::countDataRows(rowBeginIter,
+                                            rowEndIter,
+                                            m_colTokens.begin(),
+                                            m_colTokens.end(),
+                                            false);
+
+
+
+    m_size = m_cols * m_rows;
+
+
+
+    // We try to get the names
+    // of each column by parsing
+    // the title row if we found
+    // one
+
+    m_columnNames.clear();
+
+    std::ptrdiff_t numberOfColumnNames = blAlgorithmsLIB::countDataRows(titleRowBeginIter,
+                                                                        titleRowEndIter,
+                                                                        m_colTokens.begin(),
+                                                                        m_colTokens.end(),
+                                                                        false);
+
+    auto columnNameBeginIter = titleRowBeginIter;
+    auto columnNameEndIter = titleRowBeginIter;
+
+    for(int i = 0; i < numberOfColumnNames && i < m_cols; ++i)
     {
-        m_cols = 0;
-        m_size = 0;
-        m_rowIndex = 0;
-        m_colIndex = 0;
-        m_dataIndex = 0;
-        m_columnNames.clear();
-        m_iter = m_endIter;
-    }
-    else
-    {
-        // We set the current iterator to point
-        // to the first data point
-
-        m_iter = m_firstDataPointIter;
-
-        m_rowIndex = 0;
-        m_colIndex = 0;
-        m_dataIndex = 0;
-
-
-
-        // We then find the beginning and end of the
-        // first data row
-
-        blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(m_firstDataPointIter,
-                                                       m_endIter,
-                                                       m_rowTokens.begin(),
-                                                       m_rowTokens.end(),
+        blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(titleRowBeginIter,
+                                                       titleRowEndIter,
+                                                       m_rowAndColTokensCombined.begin(),
+                                                       m_rowAndColTokensCombined.end(),
                                                        false,
-                                                       0,
-                                                       rowBeginIter,
-                                                       rowEndIter);
+                                                       i,
+                                                       columnNameBeginIter,
+                                                       columnNameEndIter);
 
-
-
-        // We then count the number of columns
-        // in the first row and record that as
-        // the number of columns per row without
-        // whether that's true for all the rows
-        // in the csv data
-
-        m_cols = blAlgorithmsLIB::countDataRows(rowBeginIter,
-                                                rowEndIter,
-                                                m_colTokens.begin(),
-                                                m_colTokens.end(),
-                                                false);
-
-
-
-        m_size = m_cols * m_rows;
-
-
-
-        // We try to get the names
-        // of each column by parsing
-        // the data before the first
-        // data point
-
-        m_columnNames.clear();
-
-        std::ptrdiff_t numberOfColumnNames = blAlgorithmsLIB::countDataRows(m_beginIter,
-                                                                            m_firstDataPointIter,
-                                                                            m_colTokens.begin(),
-                                                                            m_colTokens.end(),
-                                                                            false);
-
-        auto columnNameBeginIter = m_beginIter;
-        auto columnNameEndIter = m_beginIter;
-
-        for(int i = 0; i < numberOfColumnNames && i < m_cols; ++i)
-        {
-            blAlgorithmsLIB::findBeginAndEndOfNthDataPoint(m_beginIter,
-                                                           m_firstDataPointIter,
-                                                           m_rowAndColTokensCombined.begin(),
-                                                           m_rowAndColTokensCombined.end(),
-                                                           false,
-                                                           i,
-                                                           columnNameBeginIter,
-                                                           columnNameEndIter);
-
-            m_columnNames.push_back(std::string(columnNameBeginIter,columnNameEndIter));
-        }
+        m_columnNames.push_back(std::string(columnNameBeginIter,columnNameEndIter));
     }
 }
 //-------------------------------------------------------------------

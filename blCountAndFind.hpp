@@ -40,6 +40,8 @@
 // Includes needed for these functions
 //-------------------------------------------------------------------
 #include <iterator>
+
+#include "blCyclicStlAlgorithms.hpp"
 //-------------------------------------------------------------------
 
 
