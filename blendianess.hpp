@@ -39,4 +39,6 @@ blDataType swapEndianess(const blDataType& value)
 }
 //-------------------------------------------------------------------
 
+
+
 #endif // BL_ENDIANESS_HPP

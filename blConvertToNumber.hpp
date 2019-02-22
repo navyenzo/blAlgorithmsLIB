@@ -52,6 +52,8 @@
 // Includes and libs needed for this file
 //-------------------------------------------------------------------
 #include <cmath>
+#include <cstdint>
+#include "blCyclicStlAlgorithms.hpp"
 //-------------------------------------------------------------------
 
 
@@ -65,6 +67,9 @@ namespace blAlgorithmsLIB
 
 
 
+//-------------------------------------------------------------------
+// Function used to convert a string to a number, returning an
+// iterator pointing
 //-------------------------------------------------------------------
 template<typename blStringIteratorType,
          typename blCharacterType,
@@ -366,6 +371,100 @@ inline blStringIteratorType convertToNumber(const blStringIteratorType& beginIte
     // current position
 
     return currentPos;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Convenient template functions to simplify the
+// use of the string to number conversion function
+//-------------------------------------------------------------------
+template<typename blStringType,
+         typename blNumberType>
+
+inline void convertStringToNumber(const blStringType& inputString,
+                                  blNumberType& convertedNumber)
+{
+    convertToNumber(inputString.begin(),
+                    inputString.end(),
+                    '.',
+                    convertedNumber,
+                    0);
+}
+
+
+
+template<typename blStringType>
+
+inline int convertStringToInteger(const blStringType& inputString)
+{
+    int result = 0;
+
+    convertStringToNumber(inputString,result);
+
+    return result;
+}
+
+
+
+template<typename blStringType>
+
+inline double convertStringToDouble(const blStringType& inputString)
+{
+    double result = 0;
+
+    convertStringToNumber(inputString,result);
+
+    return result;
+}
+//-------------------------------------------------------------------
+
+
+
+//-------------------------------------------------------------------
+// Function used to convert a string of multiple numbers to
+// an array of numbers
+//-------------------------------------------------------------------
+template<typename blCharacterType,
+         typename blNumberType,
+         int arrayLength>
+
+inline void convertStringOfNumbersToArrayOfNumbers(const blCharacterType* inputRawString,
+                                                   const int64_t& sizeInBytesOfInputRawString,
+                                                   blNumberType (&parsedArrayOfNumbers)[arrayLength],
+                                                   const blCharacterType& numberSeparatorDelimiter)
+{
+    auto currentPosition = inputRawString;
+    auto endOfString = inputRawString + sizeInBytesOfInputRawString;
+
+    int numberIndex = 0;
+
+
+
+    while(currentPosition != endOfString &&
+          numberIndex < arrayLength)
+    {
+        // Convert the number while also getting
+        // an iterator to the next delimiter
+
+        currentPosition = convertToNumber(currentPosition,
+                                          endOfString,
+                                          '.',
+                                          parsedArrayOfNumbers[numberIndex],
+                                          0);
+
+        // We then move to the position
+        // just after the found delimiter
+        // where the next number should start
+        // unless we've reached the end of
+        // the string
+
+        if(currentPosition != endOfString)
+            ++currentPosition;
+
+        ++numberIndex;
+    }
 }
 //-------------------------------------------------------------------
 
