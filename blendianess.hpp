@@ -14,12 +14,12 @@ namespace blAlgorithmsLIB
 
 
 //-------------------------------------------------------------------
-// Generic function swapping bytes from
+// Generic functions swapping bytes from
 // little endian to big endian and viceversa
 //-------------------------------------------------------------------
 template<typename blDataType>
 
-blDataType swapEndianess(const blDataType& value)
+inline blDataType swapEndianess(const blDataType& value)
 {
     blDataType swappedValue;
 
@@ -29,6 +29,19 @@ blDataType swapEndianess(const blDataType& value)
     }
 
     return swappedValue;
+}
+
+
+
+template<typename blDataType>
+
+inline void swapEndianess(const blDataType& sourceValue,
+                          blDataType& destinationValue)
+{
+    for(int i = 0; i < sizeof(blDataType); ++i)
+    {
+        reinterpret_cast<unsigned char*>(&destinationValue)[i] = reinterpret_cast<const unsigned char*>(&sourceValue)[sizeof(blDataType) - 1 - i];
+    }
 }
 //-------------------------------------------------------------------
 
