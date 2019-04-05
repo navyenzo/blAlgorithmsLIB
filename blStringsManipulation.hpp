@@ -1,5 +1,5 @@
-#ifndef BL_STRINGMANIPULATION_HPP
-#define BL_STRINGMANIPULATION_HPP
+#ifndef BL_STRINGSMANIPULATION_HPP
+#define BL_STRINGSMANIPULATION_HPP
 
 
 
@@ -150,4 +150,4 @@ inline void findAndReplaceAllMatchingSubstrings(std::string& sourceString,
 
 
 
-#endif // BL_STRINGMANIPULATION_HPP
+#endif // BL_STRINGSMANIPULATION_HPP

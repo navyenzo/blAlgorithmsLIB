@@ -1,5 +1,5 @@
-#ifndef BL_ENDIANESS_HPP
-#define BL_ENDIANESS_HPP
+#ifndef BL_BYTESMANIPULATION_HPP
+#define BL_BYTESMANIPULATION_HPP
 
 
 
@@ -54,4 +54,4 @@ inline void swapEndianess(const blDataType& sourceValue,
 
 
 
-#endif // BL_ENDIANESS_HPP
+#endif // BL_BYTESMANIPULATION_HPP

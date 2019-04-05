@@ -37,14 +37,15 @@
 
 // Constants and Enums needed throughout the blAlgorithmsLIB library
 
-#include "blConstantsAndEnums.hpp"
+#include "blEnumsAndConstants.hpp"
 
 
 
 // Algorithms useful for dealing
-// with endianess
+// handling bytes, for example
+// swapping endianess of variables
 
-#include "blEndianess.hpp"
+#include "blBytesManipulation.hpp"
 
 
 
@@ -91,7 +92,7 @@
 
 // Functions useful in manipulating strings
 
-#include "blStringManipulation.hpp"
+#include "blStringsManipulation.hpp"
 
 
 
