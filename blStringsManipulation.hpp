@@ -8,7 +8,7 @@
 //
 //
 //
-// PURPOSE:         // Functions useful in manipulating strings
+// PURPOSE:         Functions useful in manipulating strings
 //
 //                  -- All functions/algorithms are defined within
 //                     the "blAlgorithmsLIB" namespace
