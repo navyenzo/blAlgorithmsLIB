@@ -120,23 +120,33 @@ inline void findAndReplaceAllMatchingSubstrings(std::string& sourceString,
                                                 const std::string& oldSubstring,
                                                 const std::string& newSubstring)
 {
-    auto sourceStringIter = sourceString.begin();
+    auto positionWhereOldSubstringWasFound = std::distance(sourceString.begin(),
+                                                           std::search(sourceString.begin(),
+                                                                       sourceString.end(),
+                                                                       oldSubstring.begin(),
+                                                                       oldSubstring.end()));
 
-    while(sourceStringIter != sourceString.end())
+    auto endPosition = std::distance(sourceString.begin(),sourceString.end());
+
+
+
+    while(positionWhereOldSubstringWasFound < endPosition)
     {
-        sourceStringIter = std::search(sourceStringIter,
-                                       sourceString.end(),
-                                       oldSubstring.begin(),
-                                       oldSubstring.end());
+        sourceString.replace(positionWhereOldSubstringWasFound,oldSubstring.length(),newSubstring);
 
-        if(sourceStringIter != sourceString.end())
-        {
-            sourceStringIter = sourceString.erase(sourceStringIter,sourceStringIter + oldSubstring.size());
 
-            sourceStringIter = sourceString.insert(sourceStringIter,newSubstring.begin(),newSubstring.end());
 
-            sourceStringIter += newSubstring.size();
-        }
+        endPosition = std::distance(sourceString.begin(),sourceString.end());
+
+        positionWhereOldSubstringWasFound += newSubstring.size();
+
+
+
+        positionWhereOldSubstringWasFound = std::distance(sourceString.begin(),
+                                                          std::search(sourceString.begin() + positionWhereOldSubstringWasFound,
+                                                                      sourceString.end(),
+                                                                      oldSubstring.begin(),
+                                                                      oldSubstring.end()));
     }
 }
 //-------------------------------------------------------------------
